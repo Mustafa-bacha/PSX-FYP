@@ -1,0 +1,39 @@
+# Secrets & local env
+.env
+.env.local
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Node
+node_modules/
+client/node_modules/
+server/node_modules/
+client/dist/
+npm-debug.log*
+
+# Runtime and local tooling
+.runtime/
+*.log
+.claude/
+server/cache/*.json
+
+# Data/artifacts (keep lightweight sample files only if needed)
+models/
+data/*
+!data/.gitkeep
+data/rag_vector_store/
+data/rag_cache/
+data/reports/
+data/*.db
+data/*.sqlite
+
+# OS/editor
+.DS_Store
+.vscode/
+*.swp

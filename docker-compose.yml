@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    command: ["python", "backend/app.py"]
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      - FLASK_ENV=production
+      - ASYNC_MODE=${ASYNC_MODE:-thread}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/0}
+    depends_on:
+      - redis
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+
+  worker:
+    build: .
+    working_dir: /app/backend
+    command: ["celery", "-A", "celery_app.celery_app", "worker", "--loglevel=INFO"]
+    env_file:
+      - .env
+    environment:
+      - FLASK_ENV=production
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/0}
+    depends_on:
+      - redis
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+
+  frontend:
+    image: python:3.11-slim
+    working_dir: /app/frontend
+    command: ["python", "-m", "http.server", "8080", "--bind", "0.0.0.0"]
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/app
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
