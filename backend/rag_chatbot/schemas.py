@@ -11,7 +11,7 @@ class ChatMessage(BaseModel):
 class ChatRequest(BaseModel):
     stock: str = Field(..., description="Ticker or company name")
     question: str = Field(..., min_length=1)
-    top_k: int = Field(default=10, ge=1, le=20)
+    top_k: int = Field(default=5, ge=1, le=12)
     history: list[ChatMessage] = Field(default_factory=list)
 
 

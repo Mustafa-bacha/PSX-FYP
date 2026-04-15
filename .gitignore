@@ -1,39 +1,57 @@
-# Secrets & local env
+# ==============================
+# Secrets / environment
+# ==============================
 .env
-.env.local
-*.pem
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
 
-# Python
+# ==============================
+# Python caches / virtualenvs
+# ==============================
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
 .venv/
 venv/
 
-# Node
+# ==============================
+# Node dependencies / build
+# ==============================
 node_modules/
 client/node_modules/
 server/node_modules/
 client/dist/
-npm-debug.log*
+server/dist/
 
-# Runtime and local tooling
+# ==============================
+# Runtime / logs / local state
+# ==============================
 .runtime/
 *.log
-.claude/
-server/cache/*.json
+*.pid
 
-# Data/artifacts (keep lightweight sample files only if needed)
-/models/
-/data/*
-!/data/.gitkeep
-/data/rag_vector_store/
-/data/rag_cache/
-/data/reports/
-/data/*.db
-/data/*.sqlite
+# ==============================
+# Heavy runtime artifacts (DO NOT PUSH)
+# ==============================
+models/
+data/psx_platform.db
+data/psx_platform.db-shm
+data/psx_platform.db-wal
+data/new_psx_historical_.csv
+data/psx_historical.csv
+data/market_performers_cache.json
+data/rag_cache/
+data/rag_vector_store/
+data/reports/
+
+# Optional notebook checkpoints
+.ipynb_checkpoints/
 
 # OS/editor
 .DS_Store
 .vscode/
-*.swp

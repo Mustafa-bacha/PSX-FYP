@@ -25,7 +25,6 @@ from database import count_stock_rows, count_symbols, init_db
 from init_db import initialize_system
 from logging_utils import configure_logging
 from routes.auth import auth_bp
-from routes.chat import chat_bp
 from routes.predict import predict_bp
 from routes.sentiment import sentiment_bp
 from routes.stocks import stocks_bp
@@ -74,7 +73,6 @@ def create_app() -> Flask:
         return jsonify({"error": str(exc)}), 500
 
     app.register_blueprint(auth_bp)
-    app.register_blueprint(chat_bp)
     app.register_blueprint(stocks_bp)
     app.register_blueprint(predict_bp)
     app.register_blueprint(sentiment_bp)

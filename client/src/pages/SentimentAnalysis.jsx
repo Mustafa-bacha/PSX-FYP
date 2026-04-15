@@ -95,7 +95,7 @@ export default function SentimentAnalysis() {
     try {
       let res;
       if (selectedSymbol === 'all') {
-        res = await stocksApi.sentimentFeed(40);
+        res = await stocksApi.sentimentFeed(40, forceRefresh);
       } else {
         res = await stocksApi.news(selectedSymbol, 20);
       }
@@ -208,7 +208,10 @@ function NewsCard({ item, showSymbol }) {
       </h3>
 
       {item.summary && (
-        <p className="text-slate-300 text-sm leading-6 mb-4 flex-1">{item.summary}</p>
+        <div 
+          className="text-slate-300 text-sm leading-6 mb-4 flex-1 line-clamp-4 overflow-hidden [&_a]:text-brand-400 [&_a]:hover:underline [&_strong]:text-white [&_em]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mb-2 [&_p:last-child]:mb-0"
+          dangerouslySetInnerHTML={{ __html: item.summary }}
+        />
       )}
 
       <div className="mt-auto flex items-center justify-between gap-3">

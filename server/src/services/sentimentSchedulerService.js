@@ -85,10 +85,14 @@ export function stopSentimentScheduler() {
 
 export function autoStartSentimentScheduler() {
 	if (!config.sentimentAutoEnabled) return getSentimentSchedulerStatus();
-	return startSentimentScheduler({
+	const status = startSentimentScheduler({
 		intervalSec: config.sentimentIntervalSec,
 		batchSize: config.sentimentBatchSize
 	});
+
+	// Trigger one cycle immediately so news/sentiment aren't stale after restarts.
+	runSentimentNow().catch(() => {});
+	return status;
 }
 
 export async function runSentimentFullCycleNow() {

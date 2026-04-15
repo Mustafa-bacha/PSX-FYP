@@ -13,30 +13,8 @@ function renderInlineRich(text) {
   });
 }
 
-function normalizeAssistantText(content) {
-  let text = String(content || '').replace(/\r\n?/g, '\n').trim();
-  if (!text) return text;
-
-  text = text
-    // Ensure markdown headings start on their own line even when model returns one long paragraph.
-    .replace(/([^\n])\s+(##\s+)/g, '$1\n$2')
-    .replace(/([^\n])\s+(###\s+)/g, '$1\n$2')
-    // Add line breaks before key section labels if model emits inline sections.
-    .replace(/\s+(Technical Analysis|Fundamental Analysis|Sentiment Analysis|News and Sentiment|Headlines|Conclusion|Risk Factors|Actionable Interpretation|Disclaimer):/gi, '\n$1:')
-    // Convert star bullets into markdown bullets when they appear after punctuation/labels.
-    .replace(/(:)\s+\*\s+/g, '$1\n- ')
-    .replace(/([.!?])\s+\*\s+/g, '$1\n- ')
-    // Normalize list markers at line start.
-    .replace(/^\*\s+/gm, '- ')
-    .replace(/^•\s+/gm, '- ')
-    // Prevent excessive blank lines.
-    .replace(/\n{3,}/g, '\n\n');
-
-  return text;
-}
-
 function renderAssistantStructured(content) {
-  const lines = normalizeAssistantText(content).split('\n');
+  const lines = String(content || '').split('\n');
   const nodes = [];
   let paragraph = [];
   let listItems = [];
@@ -54,15 +32,7 @@ function renderAssistantStructured(content) {
       'actionable interpretation',
       'risks & uncertainty',
       'risks and uncertainty',
-      'recommendation',
-      'risk assessment',
-      'actionable conclusion',
-      'balanced conclusion',
-      'outlook summary',
-      'fundamental conclusion',
-      'sentiment conclusion',
-      'risk ranking & mitigation',
-      'key levels to watch',
+      'recommendation'
     ].includes(key);
   };
 
@@ -115,7 +85,7 @@ function renderAssistantStructured(content) {
       flushParagraph();
       flushList();
       nodes.push(
-        <h2 key={`h2-${nodes.length}`} className="text-base md:text-lg font-bold text-white mt-3 mb-1 border-b border-slate-700/40 pb-1">
+        <h2 key={`h2-${nodes.length}`} className="text-base md:text-lg font-bold text-white mt-2">
           {renderInlineRich(line.replace(/^##\s+/, ''))}
         </h2>
       );
@@ -126,7 +96,7 @@ function renderAssistantStructured(content) {
       flushParagraph();
       flushList();
       nodes.push(
-        <h2 key={`ph-${nodes.length}`} className="text-base md:text-lg font-bold text-white mt-3 mb-1 border-b border-slate-700/40 pb-1">
+        <h2 key={`ph-${nodes.length}`} className="text-base md:text-lg font-bold text-white mt-2">
           {renderInlineRich(line.replace(/[:\-]+\s*$/, ''))}
         </h2>
       );
@@ -136,13 +106,6 @@ function renderAssistantStructured(content) {
     if (/^[-*]\s+/.test(line)) {
       flushParagraph();
       listItems.push(line.replace(/^[-*]\s+/, ''));
-      continue;
-    }
-
-    // Numbered list items (1. 2. etc.)
-    if (/^\d+\.\s+/.test(line)) {
-      flushParagraph();
-      listItems.push(line.replace(/^\d+\.\s+/, ''));
       continue;
     }
 
@@ -156,20 +119,6 @@ function renderAssistantStructured(content) {
     <div className="space-y-2">
       {nodes.length ? nodes : <p className="text-slate-200 whitespace-pre-wrap">{content}</p>}
     </div>
-  );
-}
-
-function SentimentBadge({ sentiment }) {
-  const colors = {
-    positive: 'bg-green-500/20 text-green-300 border-green-500/40',
-    negative: 'bg-red-500/20 text-red-300 border-red-500/40',
-    neutral: 'bg-slate-500/20 text-slate-300 border-slate-500/40',
-  };
-  const cls = colors[sentiment] || colors.neutral;
-  return (
-    <span className={`px-2 py-0.5 rounded border text-xs font-medium ${cls}`}>
-      {sentiment}
-    </span>
   );
 }
 
@@ -193,8 +142,9 @@ export default function Chat() {
     ? (symbol.trim().toUpperCase() || 'Select symbol')
     : 'MARKET';
 
-  const send = async (override = '') => {
-    const q = String(override || input).trim();
+  const send = async (override) => {
+    const qSource = typeof override === 'string' ? override : input;
+    const q = String(qSource || '').trim();
     if (!q || loading) return;
 
     if (mode === 'STOCK' && !symbol.trim()) {
@@ -259,7 +209,7 @@ export default function Chat() {
   <section className={`${cardClass} p-4 border-slate-700/60 relative z-30 overflow-visible`}>
         <h1 className="text-2xl font-bold text-white mb-1">RAG Chat Assistant</h1>
         <p className="text-slate-400 text-sm">
-          Comprehensive PSX Q&amp;A using deep historical analysis, PSX fundamentals, technical indicators &amp; daily refreshed business news.
+          Comprehensive PSX Q&amp;A using historical market data + daily refreshed business news.
         </p>
 
         <div className="mt-4 grid md:grid-cols-[auto_auto_minmax(0,1fr)] gap-2 items-center">
@@ -283,7 +233,10 @@ export default function Chat() {
           <div className={mode !== 'STOCK' ? 'opacity-60 pointer-events-none' : ''}>
             <StockSearch
               placeholder="Search symbol (e.g., OGDC)"
-              onSelect={(ticker) => setSymbol(String(ticker || '').toUpperCase())}
+              onSelect={(ticker) => {
+                const s = typeof ticker === 'string' ? ticker : String(ticker?.symbol ?? ticker ?? '');
+                setSymbol(s.trim().toUpperCase());
+              }}
               showDefaultWhenEmpty
               defaultListLimit={5000}
               queryLimit={5000}
@@ -299,21 +252,19 @@ export default function Chat() {
 
         <div className="mt-3 flex flex-wrap gap-2">
           {[
-            { label: 'Full Analysis', prompt: `Give me a complete analysis of ${activeScope} with technical levels, sentiment, and recommendation.` },
-            { label: 'Market Outlook', prompt: 'Give me a full PSX market outlook for today with key risks and top movers.' },
-            { label: 'Buy/Sell Signal', prompt: `Should I buy ${activeScope}? Analyze trend, momentum, volume, sentiment and give entry/exit levels.` },
-            { label: 'News & Sentiment', prompt: `What are the latest news and sentiment trends for ${activeScope}? Include headline analysis.` },
-            { label: 'Risk Assessment', prompt: `What are the key risks for ${activeScope}? Include volatility, support levels, and stop-loss suggestions.` },
-            { label: 'Historical Trend', prompt: `Show me the complete historical performance of ${activeScope} with weekly and monthly breakdowns.` },
-          ].map((item, idx) => (
+            'Give me a full market outlook for today with key risks.',
+            `Analyze ${activeScope} using historical trend + latest news and give balanced view.`,
+            `What is the best and worst case scenario for ${activeScope} this week?`,
+            'Which PSX stocks are strongest based on both momentum and sentiment?'
+          ].map((prompt, idx) => (
             <button
-              key={`${idx}-${item.label}`}
+              key={`${idx}-${prompt.slice(0, 12)}`}
               type="button"
-              onClick={() => send(item.prompt)}
+              onClick={() => send(prompt)}
               disabled={loading}
-              className="px-2.5 py-1.5 rounded border border-slate-600 text-slate-300 text-xs hover:bg-slate-700/50 disabled:opacity-50 transition-colors"
+              className="px-2.5 py-1.5 rounded border border-slate-600 text-slate-300 text-xs hover:bg-slate-700/50 disabled:opacity-50"
             >
-              {item.label}
+              {idx === 0 ? 'Market Outlook' : idx === 1 ? 'Deep Stock Analysis' : idx === 2 ? 'Scenario Analysis' : 'Strongest Stocks'}
             </button>
           ))}
         </div>
@@ -322,15 +273,9 @@ export default function Chat() {
   <div className={`${cardClass} flex flex-col min-h-[500px] relative z-10`}>
         <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[380px]">
           {messages.length === 0 && (
-            <div className="text-slate-500 text-sm space-y-2">
-              <p>Try asking detailed questions like:</p>
-              <ul className="list-disc pl-5 space-y-1 text-slate-500/80">
-                <li>&quot;Give me a complete technical and fundamental analysis of ENGRO with entry/exit levels&quot;</li>
-                <li>&quot;What is the PSX market breadth today? Show top gainers and losers&quot;</li>
-                <li>&quot;Analyze OGDC sentiment trend — is news flow improving or deteriorating?&quot;</li>
-                <li>&quot;What are the support and resistance levels for MCB with pivot points?&quot;</li>
-              </ul>
-            </div>
+            <p className="text-slate-500 text-sm">
+              Try: &quot;Analyze OGDC with historical and latest news evidence&quot; or &quot;Give a structured PSX market outlook with risks&quot;.
+            </p>
           )}
           {messages.map((msg, i) => (
             <div key={i} className={msg.role === 'user' ? 'text-right' : ''}>
@@ -344,34 +289,16 @@ export default function Chat() {
                 {msg.role === 'assistant' ? renderAssistantStructured(msg.content) : msg.content}
               </div>
 
-              {msg.role === 'assistant' && (msg.sentiment || msg.scope || msg.retrieval) && (
-                <div className="mt-1.5 text-xs text-slate-500 flex flex-wrap gap-2 items-center">
-                  {msg.scope ? (
-                    <span className="px-2 py-0.5 rounded border border-slate-600 bg-slate-800/50">
-                      Scope: <span className="text-brand-300 font-mono">{msg.scope}</span>
-                    </span>
-                  ) : null}
-                  {msg.sentiment ? (
-                    <SentimentBadge sentiment={msg.sentiment} />
-                  ) : null}
+              {msg.role === 'assistant' && (msg.sentiment || msg.scope) && (
+                <div className="mt-1 text-xs text-slate-500 flex flex-wrap gap-2">
+                  {msg.scope ? <span className="px-2 py-0.5 rounded border border-slate-600">Scope: {msg.scope}</span> : null}
+                  {msg.sentiment ? <span className="px-2 py-0.5 rounded border border-slate-600">Sentiment: {msg.sentiment}</span> : null}
                   {msg.retrieval?.used_chunks != null ? (
-                    <span className="px-2 py-0.5 rounded border border-slate-600 bg-slate-800/50">
-                      RAG: {msg.retrieval.used_chunks} chunks
-                      <span className="text-slate-600 mx-1">|</span>
+                    <span className="px-2 py-0.5 rounded border border-slate-600">
+                      RAG chunks: {msg.retrieval.used_chunks} (
                       {msg.retrieval.historical_chunks || 0} historical
-                      {msg.retrieval.fundamentals_chunks ? (
-                        <>
-                          <span className="text-slate-600 mx-1">|</span>
-                          {msg.retrieval.fundamentals_chunks} fundamentals
-                        </>
-                      ) : null}
-                      <span className="text-slate-600 mx-1">|</span>
-                      {msg.retrieval.news_chunks || 0} news
-                    </span>
-                  ) : null}
-                  {msg.sources?.length > 0 ? (
-                    <span className="px-2 py-0.5 rounded border border-slate-600 bg-slate-800/50">
-                      Sources: {msg.sources.map(s => s.source || s.doc_type).filter(Boolean).slice(0, 4).join(', ')}
+                      {msg.retrieval.report_chunks != null ? `, ${msg.retrieval.report_chunks} PSX DPS` : ''}
+                      , {msg.retrieval.news_chunks || 0} news)
                     </span>
                   ) : null}
                 </div>
@@ -379,16 +306,7 @@ export default function Chat() {
 
             </div>
           ))}
-          {loading && (
-            <div className="flex items-center gap-2 text-slate-400 text-sm">
-              <div className="flex gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-bounce" style={{ animationDelay: '300ms' }} />
-              </div>
-              Analyzing data and generating response...
-            </div>
-          )}
+          {loading && <p className="text-slate-500 text-sm">Thinking…</p>}
           <div ref={bottomRef} />
         </div>
         <div className="p-4 border-t border-slate-700/50 flex gap-2">
@@ -398,14 +316,15 @@ export default function Chat() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && send()}
             placeholder={mode === 'MARKET'
-              ? 'Ask about PSX market outlook, breadth, top movers, sector trends...'
-              : `Ask about ${activeScope} — analysis, buy/sell, news, risk, fundamentals...`}
+              ? 'Ask anything about overall PSX with evidence...'
+              : `Ask anything about ${activeScope} with evidence...`}
             className="flex-1 bg-surface-900 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:ring-2 focus:ring-brand-500"
           />
           <button
+            type="button"
             onClick={() => send()}
             disabled={loading || !input.trim()}
-            className="bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg font-medium transition-colors"
+            className="bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg font-medium"
           >
             Send
           </button>

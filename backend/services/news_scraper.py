@@ -19,8 +19,6 @@ HEADERS = {
 }
 NEWS_SOURCES = [
     ("dawn", "https://www.dawn.com/business"),
-    ("brecorder", "https://www.brecorder.com/business-finance"),
-    ("thenews", "https://www.thenews.com.pk/latest/category/business"),
 ]
 
 

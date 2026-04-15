@@ -9,7 +9,10 @@ const NEWS_SOURCES = [
 	{ name: 'dawn_business', url: 'https://www.dawn.com/feeds/business' },
 	{ name: 'business_recorder', url: 'https://www.brecorder.com/feeds/latest-news' },
 	{ name: 'tribune_business', url: 'https://tribune.com.pk/feed/business' },
-	{ name: 'profit_pakistantoday', url: 'https://profit.pakistantoday.com.pk/feed/' }
+	{ name: 'profit_pakistantoday', url: 'https://profit.pakistantoday.com.pk/feed/' },
+	/* Often more reachable when PK feeds time out; still useful for macro/outlook context */
+	{ name: 'bbc_business', url: 'https://feeds.bbci.co.uk/news/business/rss.xml' },
+	{ name: 'al_jazeera_economy', url: 'https://www.aljazeera.com/xml/rss/all.xml' }
 ];
 
 const POS_WORDS = ['gain', 'growth', 'profit', 'surge', 'up', 'strong', 'record', 'bullish', 'improve', 'beat'];
@@ -53,8 +56,12 @@ function labelFromScoreHeuristic(score) {
 async function fetchRss(source) {
 	try {
 		const res = await axios.get(source.url, {
-			timeout: 25000,
-			headers: { 'User-Agent': 'Mozilla/5.0' }
+			timeout: 35000,
+			headers: {
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+				Accept: 'application/rss+xml, application/xml, text/xml, */*'
+			},
+			validateStatus: (s) => s >= 200 && s < 400
 		});
 
 		const $ = cheerio.load(res.data, { xmlMode: true });

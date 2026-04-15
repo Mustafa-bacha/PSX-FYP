@@ -41,6 +41,7 @@ function sentimentLabel(score) {
 
 function mapHeadline(item = {}, fallbackSymbol = '') {
   const score = Number(item.score ?? 0);
+  const ts = item.time || item.analyzed_at || item.pubDate || item.published_at || '';
   return {
     symbol: item.symbol || fallbackSymbol,
     sentiment: item.label ? `${item.label[0]}${item.label.slice(1).toLowerCase()}` : sentimentLabel(score),
@@ -48,7 +49,7 @@ function mapHeadline(item = {}, fallbackSymbol = '') {
     headline: item.headline || item.title || 'Untitled',
     summary: item.summary || '',
     source: item.source || 'news',
-    time: item.time || '',
+    time: ts,
     link: item.link || item.url || ''
   };
 }
@@ -63,17 +64,15 @@ export const auth = {
       access_token: token
     };
   },
-  async register(email, password, profile = {}) {
+  async register(email, password, confirmPassword, profile = {}) {
     return apiClient.signup({
       email,
       password,
+      confirm_password: confirmPassword,
       full_name: String(profile?.full_name || '').trim(),
       date_of_birth: profile?.date_of_birth || null,
     });
-  },
-  googleStartUrl() {
-    return apiClient.googleStartUrl();
-  },
+  }
 };
 
 export const stocks = {
@@ -177,8 +176,8 @@ export const stocks = {
     return { news: headlines.slice(0, limit).map((h) => mapHeadline(h, symbol)) };
   },
 
-  async sentimentFeed(limit = 30) {
-    const payload = await apiClient.dailyNews(limit, false);
+  async sentimentFeed(limit = 30, refresh = false) {
+    const payload = await apiClient.dailyNews(limit, refresh);
     const items = Array.isArray(payload?.items) ? payload.items : [];
     return { news: items.map((item) => mapHeadline(item, item.symbol || 'MARKET')) };
   },
@@ -207,10 +206,17 @@ export const watchlist = {
 
 export const chatbot = {
   async ask(query, { stock = 'MARKET', history = [] } = {}) {
+    let questionText = query;
+    if (typeof questionText !== 'string') {
+      if (questionText && typeof questionText === 'object') {
+        questionText = questionText.text ?? questionText.content ?? questionText.message ?? '';
+      }
+      questionText = String(questionText ?? '').trim();
+    }
     const token = getToken() || undefined;
     const payload = await apiClient.chat({
       stock,
-      question: query,
+      question: questionText,
       history,
       token,
     });

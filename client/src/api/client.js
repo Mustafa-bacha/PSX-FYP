@@ -74,13 +74,13 @@ export const apiClient = {
     body: { stock, question, history }
   }),
 
-  signup: ({ email, password, full_name, date_of_birth }) => api('/auth/signup', {
+  signup: ({ email, password, confirm_password, full_name, date_of_birth }) => api('/auth/signup', {
     method: 'POST',
-    body: { email, password, full_name, date_of_birth }
+    body: { email, password, confirm_password, full_name, date_of_birth }
   }),
   login: ({ email, password }) => api('/auth/login', {
     method: 'POST',
-    body: { email, username: email, password }
+    body: { email, password }
   }),
   me: (token) => api('/auth/me', { token }),
   watchlist: (token) => api('/user/watchlist', { token }),
@@ -130,6 +130,5 @@ export const apiClient = {
   clearChatHistory: (symbol, token) => api(`/user/chat-history/${encodeURIComponent(symbol || 'MARKET')}`, {
     method: 'DELETE',
     token
-  }),
-  googleStartUrl: () => `${API_BASE}/auth/google/start`
+  })
 };

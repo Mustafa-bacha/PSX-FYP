@@ -18,9 +18,8 @@ GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_BASE_URL = os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1/chat/completions")
 
-# Larger chunks preserve more context per retrieval hit
-RAG_CHUNK_SIZE = int(os.getenv("RAG_CHUNK_SIZE", "1200"))
-RAG_CHUNK_OVERLAP = int(os.getenv("RAG_CHUNK_OVERLAP", "200"))
+RAG_CHUNK_SIZE = int(os.getenv("RAG_CHUNK_SIZE", "900"))
+RAG_CHUNK_OVERLAP = int(os.getenv("RAG_CHUNK_OVERLAP", "150"))
 
 for p in (RAG_DOCS_DIR, RAG_STORE_DIR, RAG_CACHE_DIR):
     p.mkdir(parents=True, exist_ok=True)

@@ -1,0 +1,17 @@
+{
+  "name": "psx-platform-js",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "predev": "kill-port 5000 5001 5173 || true",
+    "dev": "concurrently -k \"../.venv/bin/python backend/app.py\" \"npm --prefix server run dev\" \"npm --prefix client run dev -- --host --port 5173\"",
+    "dev:backend": "../.venv/bin/python backend/app.py",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev -- --host --port 5173",
+    "start": "concurrently -k \"../.venv/bin/python backend/app.py\" \"npm --prefix server run start\" \"npm --prefix client run preview -- --host --port 5173\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1",
+    "kill-port": "^2.0.1"
+  }
+}

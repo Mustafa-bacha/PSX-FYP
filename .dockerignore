@@ -1,0 +1,43 @@
+# Keep Docker build context small and safe
+.git
+.gitignore
+
+# Env / secrets
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Python caches / venv
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Node deps / builds
+node_modules/
+client/node_modules/
+server/node_modules/
+client/dist/
+server/dist/
+
+# Runtime artifacts
+.runtime/
+*.log
+*.pid
+
+# Very large runtime data (mount/provision at runtime instead)
+models/
+data/psx_platform.db
+data/psx_platform.db-shm
+data/psx_platform.db-wal
+data/new_psx_historical_.csv
+data/psx_historical.csv
+data/market_performers_cache.json
+data/rag_cache/
+data/rag_vector_store/
+data/reports/
+
+# Notebook checkpoints
+.ipynb_checkpoints/

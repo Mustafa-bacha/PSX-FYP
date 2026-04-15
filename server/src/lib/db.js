@@ -2,10 +2,8 @@ import Database from 'better-sqlite3';
 import { config } from '../config.js';
 
 export const db = new Database(config.dbPath);
-let dbInitialized = false;
 
 export function initDb() {
-	if (dbInitialized) return;
 	db.exec(`
 		CREATE TABLE IF NOT EXISTS stocks (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,6 +52,7 @@ export function initDb() {
 			email TEXT NOT NULL UNIQUE,
 			password_hash TEXT,
 			full_name TEXT,
+			date_of_birth TEXT,
 			google_id TEXT UNIQUE,
 			avatar_url TEXT,
 			provider TEXT NOT NULL DEFAULT 'local',
@@ -159,8 +158,10 @@ export function initDb() {
 			CREATE INDEX IF NOT EXISTS idx_user_sim_equity_user_created
 				ON user_sim_equity_snapshots(user_id, created_at DESC);
 	`);
-	dbInitialized = true;
-}
 
-// Ensure schema exists before other modules prepare statements at import time.
-initDb();
+	try {
+		db.exec(`ALTER TABLE users ADD COLUMN date_of_birth TEXT;`);
+	} catch {
+		// Column already exists on older databases.
+	}
+}

@@ -1,0 +1,551 @@
+SYMBOL	COMPANY
+786	786 Investments Limited
+AABS	Al-Abbas Sugar Mills Limited
+AAL	Agro Allianz Limited
+AASM	Al-Abid Silk Mills Limited
+AATM	Ali Asghar Textile Mills Limited
+ABL	Allied Bank Limited
+ABOT	Abbott Laboratories (Pakistan) Limited
+ABSON	Abson Industries Limited
+ACPL	Attock Cement Pakistan Limited
+ADAMS	Adam Sugar Mills Limited
+ADMM	Artistic Denim Mills Limited
+AGHA	Agha Steel Ind.Ltd
+AGIC	Askari General Insurance Company Limited
+AGIL	Agriauto Industries Limited
+AGL	Agritech Limited
+AGLNCPS	Agritech Non-Voting (Pref) Class A
+AGP	AGP Limited
+AGSML	Abdullah Shah Ghazi Sugar Mills Limited
+AGTL	Al-Ghazi Tractors Limited
+AHCL	Arif Habib Corporation Limited
+AHL	Arif Habib Limited
+AHTM	Ahmad Hassan Textile Mills Limited
+AICL	Adamjee Insurance Company Limited
+AIRLINK	Air Link Communication Limited
+AKBL	Askari Bank Limited
+AKDHL	AKD Hospitality Limited
+AKDSL	AKD Securities Limited
+AKGL	Al-Khair Gadoon Limited
+ALAC	Askari Life Assurance Company Limited
+ALIFE	Adamjee Life Assurance Company Limited
+ALNRS	Al-Noor Sugar Mills Limited
+ALTN	Altern Energy Limited
+AMBL	Apna Microfinance Bank Limited
+AMSL	Al-Mal Securities & Services Limited
+AMTEX	Amtex Limited
+ANL	Azgard Nine Limited
+ANLNV	Azgard Nine Non-Voting Ordinary Shares
+ANLPS	Azgard Nine 8.95%(Pref)
+ANNT	Annoor Textile Mills Limited
+ANSM	Ansari Sugar Mills Limited
+ANTM	AN Textile Mills Limited
+APL	Attock Petroleum Limited
+APOT	Apollo Textile Mills Limited
+ARCTM	Arctic Textile Mills Limited
+ARMG	ARM Green Industries Limited
+ARPAK	Arpak International Investments Ltd.
+ARPL	Archroma Pakistan Limited
+ARUJ	Aruj Industries Limited
+ASC	Al Shaheer Corporation Limited
+ASHT	Ashfaq Textile Mills Limited
+ASIC	Asia Insurance Company Limited
+ASL	Aisha Steel Mills Limited
+ASLCPS	Aisha Steel Convt (Pref) Right
+ASLPS	Aisha Steel Convertible (Pref)
+ASTL	Amreli Steels Limited
+ASTM	Asim Textile Mills Limited
+ATBA	Atlas Battery Limited
+ATIL	Atlas Insurance Limited
+ATLH	Atlas Honda Limited
+ATRL	Attock Refinery Limited
+AVN	Avanceon Limited
+AWTX	Allawasaya Tex. & Finishing Mills Ltd
+AZMT	Azmat Textile Mills Limited
+BAFL	Bank Alfalah Limited
+BAFS	Baba Farid Sugar Mills Limited
+BAHL	Bank AL Habib Limited
+BAPL	Bawany Air Products Limited
+BATA	Bata Pakistan Limited
+BBFL	Big Bird Foods Limited
+BCL	Bolan Castings Limited
+BECO	Beco Steel Limited
+BELA	Bela Automotives Limited
+BERG	Berger Paints Pakistan Limited
+BFAGRO	Barkat Frisian Agro Limited
+BFBIO	BF Biosciences Limited
+BFMOD	B.F. Modaraba
+BGL	Baluchistan Glass Limited
+BHAT	Bhanero Textile Mills Limited
+BIFO	Biafo Industries Limited
+BIIC	Business & Industrial Insurance Company
+BIPL	BankIslami Pakistan Limited
+BLUEX	Blue-Ex Limited
+BML	Bank Makramah Limited
+BNL	Bunnys Limited
+BNWM	Bannu Woollen Mills Limited
+BOK	The Bank of Khyber
+BOP	The Bank of Punjab
+BPL	Burshane LPG (Pakistan) Limited
+BRRG	B.R.R Guardian Limited
+BTL	Blessed Textiles Limited
+BUXL	Buxly Paints Limited
+BWCL	Bestway Cement Limited
+BWHL	Baluchistan Wheels Limited
+CCM	Crescent Cotton Mills Limited
+CENI	Century Insurance Company Limited
+CEPB	Century Paper & Board Mills Limited
+CFL	Crescent Fibres Limited
+CHAS	Chashma Sugar Mills Limited
+CHBL	Chenab Limited
+CHCC	Cherat Cement Company Limited
+CJPL	Crescent Jute Products Limited
+CLCPS	Chenab Limited (Pref)
+CLOV	Clover Pakistan Limited
+CLVL	Cordoba Logistics & Ventures Limited
+CNERGY	Cnergyico PK  Limited
+COLG	Colgate-Palmolive (Pakistan) Limited
+CPHL	Citi Pharma Ltd.
+CPPL	Cherat Packaging Limited
+CRTM	The Crescent Textile Mills Limited
+CSAP	Crescent Steel & Allied Products Limited
+CSIL	Crescent Star Insurance Limited
+CTM	Colony Textile Mills Limited
+DAAG	Data Agro Limited
+DADX	Dadex Eternit Limited
+DBCI	Dadabhoy Cement Industries Limited
+DBSL	Dadabhoy Sack Limited
+DCL	Dewan Cement Limited
+DCR	Dolmen City REIT
+DCTL	Dadabhoy Construction Technology Limited
+DEL	Dawood Equities Limited
+DFML	Dewan Farooque Motors Limited
+DFSM	Dewan Farooque Spinning Mills Limited
+DGKC	D.G. Khan Cement Company Limited
+DIIL	Diamond Industries Limited
+DINT	Din Textile Mills Limited
+DKTM	Dewan Khalid Textile Mills Limited
+DLL	Dawood Lawrencepur Limited
+DMC	D.M. Corporation Limited.
+DMTM	Dewan Mushtaq Textile Mills Limited
+DNCC	Dandot Cement Company Limited
+DOL	Descon Oxychem Limited
+DSFL	Dewan Salman Fibre Limited
+DSIL	D.S. Industries Limited
+DSL	Dost Steels Limited
+DWAE	Dewan Automotive Engineering Limited
+DWSM	Dewan Sugar Mills Limited
+DWTM	Dewan Textile Mills Limited
+DYNO	Dynea Pakistan Limited
+ECOP	Ecopack Limited
+EFERT	Engro Fertilizers Limited
+EFUG	EFU General Insurance Limited
+EFUL	EFU Life Assurance Limited
+ELCM	Elahi Cotton Mills Limited
+ELSM	Ellcot Spinning Mills Limited
+EMCO	Emco Industries Limited
+ENGL	English Leasing Limited
+ENGROH	Engro Holdings Limited
+EPCL	Engro Polymer & Chemicals Limited
+EPCLPS	Engro Poly(Pref)
+EPQL	Engro Powergen Qadirpur Limited
+ESBL	Escorts Investment Bank Limited
+EWIC	East West Insurance Company Limited
+EXIDE	Exide Pakistan Limited
+FABL	Faysal Bank Limited
+FAEL	Fatima Enterprises Limited
+FANM	First Al-Noor Modaraba
+FASM	Faisal Spinning Mills Limited
+FATIMA	Fatima Fertilizer Company Limited
+FCCL	Fauji Cement Company Limited
+FCEL	First Capital Equities Limited
+FCEPL	Frieslandcampina Engro Pakistan Limited
+FCIBL	First Credit and Investment Bank Limited
+FCL	Fast Cables Limited
+FCONM	First Constellation Modaraba
+FCSC	First Capital Securities Corporation
+FDPL	First Dawood Properties Limited
+FECM	First Elite Capital Modaraba
+FECTC	Fecto Cement Limited
+FEM	First Equity Modaraba
+FEROZ	Ferozsons Laboratories Limited
+FFC	Fauji Fertilizer Company Limited
+FFL	Fauji Foods Limited
+FFLM	First Fidelity Leasing Modaraba
+FHAM	First Habib Modaraba
+FIBLM	First IBL Modaraba
+FIL	Fateh Industries Limited
+FIM	First Investec Modaraba
+FIMM	First Imrooz Modaraba
+FLYNG	Flying Cement Company Limited
+FML	Feroze1888 Mills Limited
+FNBM	First National Bank Modaraba
+FNEL	First National Equities Limited
+FPJM	First Punjab Modaraba
+FPRM	First Paramount Modaraba
+FRCL	Frontier Ceramics Limited
+FRSM	Faran Sugar Mills Limited
+FSWL	Fateh Sports Wear Limited
+FTHM	Fateh Textile Mills Limited
+FTMM	First Treet Manufacturing Modaraba
+FTSM	First Tri-Star Modaraba
+FZCM	Fazal Cloth Mills Limited
+GADT	Gadoon Textile Mills Limited
+GAL	Ghandhara Automobiles Limited
+GAMON	Gammon Pakistan Limited
+GATI	Gatron (Industries) Limited
+GATM	Gul Ahmed Textile Mills Limited
+GCIL	Ghani Chemical Industries Limited
+GCWL	Ghani Chemworld Limited
+GDL	Ghani Dairies Limited
+GEMBCEM	Burj Clean Energy Modaraba(GEM)
+GEMMEL	Mughal Energy Limited(GEM)
+GEMNETS	Nets International Communication Limited
+GEMPACRA	The Pakistan Credit Rating Agency Ltd
+GEMPAPL	Pak Agro Packaging Limited(GEM)
+GFIL	Ghazi Fabrics International Limited
+GGGL	Ghani Global Glass Limited
+GGL	Ghani Global Holdings Limited
+GHGL	Ghani Glass Limited
+GHNI	Ghandhara Industries Limited
+GIL	Good Luck Industries Ltd.
+GLAXO	GlaxoSmithKline Pakistan Limited
+GLOT	Globe Textile Mills Limited
+GLPL	Gillette Pakistan Limited
+GOC	GOC (Pak) Limited.
+GRR	Globe Residency REIT
+GRYL	Grays Leasing Limited
+GSPM	Gulshan Spinning Mills Limited
+GTYR	Ghandhara Tyre & Rubber Company Limited
+GUSM	Gulistan Spinning Mills Limited
+GUTM	Gulistan Textile Mills Limited
+GVGL	Ghani Value Glass Limited
+GWLC	Gharibwal Cement Limited
+HABSM	Habib Sugar Mills Limited
+HADC	Haydari Construction Company Limited
+HAEL	Hala Enterprises Limited
+HAFL	Hafiz Limited
+HAJT	Hajra Textile Mills Limited
+HALEON	Haleon Pakistan Limited
+HASCOL	Hascol Petroleum Limited
+HATM	Hamid Textile Mills Limited
+HBL	Habib Bank Limited
+HCAR	Honda Atlas Cars (Pakistan) Limited
+HGFA	HBL Growth Fund
+HICL	Habib Insurance Company Limited
+HIFA	HBL Investment Fund
+HINO	Hinopak Motors Limited
+HINOON	Highnoon Laboratories Limited
+HIRAT	Hira Textile Mills Limited
+HKKT	Hakkim Textile Mills Limited
+HMB	Habib Metropolitan Bank Limited
+HMIM	Haji Mohammad Ismail Mills Limited
+HPL	Hoechst Pakistan Limited
+HRPL	Habib Rice Product Limited.
+HSPI	Huffaz Seamless Pipe Industries Limited
+HTL	Hi-Tech Lubricants Limited
+HUBC	The Hub Power Company Limited
+HUMNL	Hum Network Limited
+HUSI	Husein Industries Limited
+HWQS	Haseeb Waqas Sugar Mills Limited
+IBFL	Ibrahim Fibres Limited
+IBLHL	IBL HealthCare Limited
+ICCI	ICC Industries Limited
+ICIBL	Invest Capital Investment Bank Limited
+ICL	Ittehad Chemicals Limted
+IDRT	Idrees Textile Mills Limited
+IDSM	Ideal Spinning Mills Limited
+IDYM	Indus Dyeing & Manufacturing Co. Limited
+IGIHL	IGI Holdings Limited
+IGIL	IGI Life Insurance Limited
+ILP	Interloop Limited
+IMAGE	Image Pakistan Limited
+IML	Imperial  Limited
+IMS	Intermarket Securities Limited
+INDU	Indus Motor Company Limited
+INIL	International Industries Limited
+INKL	International Knitwear Limited
+INMF	Investec Mutual Fund Limited
+IPAK	International Packaging Films Limited
+IREIT	Image Reit
+ISIL	Ismail Industries Limited
+ISL	International Steels Limited
+ITANZ	Itanz Technologies Limited
+ITTEFAQ	Ittefaq Iron Industries Limited
+JATM	J.A. Textile Mills Limited
+JDMT	Janana De Malucho Textile Mills Limited
+JDWS	JDW Sugar Mills Limited
+JGICL	Jubilee General Insurance Limited
+JKSM	J.K. Spinning Mills Limited
+JLICL	Jubilee Life Insurance Company Limited
+JSBL	JS Bank Limited
+JSCL	Jahangir Siddiqui & Co. Ltd.
+JSGCL	JS Global Capital Limited
+JSIL	JS Investments Limited
+JSML	Jauharabad Sugar Mills Limited
+JUBS	Jubilee Spinning & Weaving Mills Ltd.
+JVDC	Javedan Corporation Limited
+JVDCPS	Javedan Corporation (Pref)
+KAKL	Kaiser Arts & Krafts Limited
+KAPCO	Kot Addu Power Company Limited
+KCL	Karam Ceramics Limited
+KEL	K-Electric Limited
+KHTC	Khyber Tobacco Company Limited
+KHYT	Khyber Textile Mills Limited
+KML	Kohinoor Mills Limited
+KOHC	Kohat Cement Company Limited
+KOHE	Kohinoor Energy Limited
+KOHP	Kohinoor Power Company Limited
+KOHTM	Kohat Textile Mills Limited
+KOIL	Kohinoor Industries Limited
+KOSM	Kohinoor Spinning Mills Limited
+KPUS	Khairpur Sugar Mills Limited
+KSBP	KSB Pumps Company Limited
+KSTM	Khalid Siraj Textile Mills Limited
+KTML	Kohinoor Textile Mills Limited
+LCI	Lucky Core Industries Limited
+LEUL	Leather Up Limited
+LIVEN	Liven Pharma Limited
+LOADS	Loads Limited
+LOTCHEM	Lotte Chemical Pakistan Limited
+LPGL	Leiner Pak Gelatine Limited
+LPL	Lalpir Power Limited
+LSECL	LSE Capital Limited.
+LSEFSL	LSE Financial Services Limited.
+LSEVL	LSE Ventures Limited
+LUCK	Lucky Cement Limited
+MACFL	MACPAC Films Limited
+MACTER	Macter International Limited
+MARI	Mari Energies Limited
+MCB	MCB Bank Limited
+MCBIM	MCB Investment Management Limited.
+MDTL	Media Times Limited
+MEBL	Meezan Bank Limited
+MEHT	Mehmood Textile Mills Limited
+MERIT	Merit Packaging Limited
+MFFL	Mitchells Fruit Farms Limited
+MFFLR1	Mitchells Fruit Farms Limited(Right)
+MFL	Matco Foods Limited
+MFTM	Mohammad Farooq Textile Mills Limited
+MIRKS	Mirpurkhas Sugar Mills Limited
+MLCF	Maple Leaf Cement Factory Limited
+MOHE	Mohib Exports Limited
+MQTM	Maqbool Textile Mills Limited
+MRNS	Mehran Sugar Mills Limited
+MSCL	Metropolitan Steel Corporation Limited
+MSOT	Masood Textile Mills Limited
+MSOTPS	Masood Textile (Pref)
+MTL	Millat Tractors Limited
+MUBT	Mubarak Textile Mills Limited
+MUGHAL	Mughal Iron & Steel Industries Limited
+MUGHALC	Mughal Iron & Steel Industries Ltd(C)
+MUREB	Murree Brewery Company Limited
+MWMP	Mandviwala Mauser Plastic Industries
+NAFL	National Fibres Limited
+NAGC	Nagina Cotton Mills Limited
+NATF	National Foods Limited
+NATM	Nadeem Textile Mills Limited
+NBP	National Bank of Pakistan
+NCL	Nishat Chunian Limited
+NCML	Nazir Cotton Mills Limited
+NCPL	Nishat Chunian Power Limited
+NESTLE	Nestle Pakistan Limited
+NETSOL	NetSol Technologies Limited
+NEXT	Next Capital Limited
+NICL	Nimir Industrial Chemicals Limited
+NINA	Nina Industries Limited
+NMFL	Nirala MSR Foods Limited
+NML	Nishat Mills Limited
+NONS	Noon Sugar Mills Limited
+NPL	Nishat Power Limited
+NRL	National Refinery Limited
+NRSL	Nimir Resins Limited
+NSRM	The National Silk & Rayon Mills Limited
+OBOY	Oilboy Energy Limited
+OCTOPUS	Octopus Digital Limited
+OGDC	Oil & Gas Development Company Limited
+OLPL	OLP Financial Services Pakistan Limited
+OLPM	OLP Modaraba
+OML	Olympia Mills Limited
+ORM	Orient Rental Mod
+OTSU	Otsuka Pakistan Limited
+PABC	Pakistan Aluminium Beverage Cans Limited
+PACE	Pace (Pakistan) Limited
+PAEL	Pak Elektron Limited
+PAKD	Pak Datacom Limited
+PAKL	Pak Leather Crafts Limited
+PAKOXY	Pakistan Oxygen Limited
+PAKQATAR	Pak Qatar Family Takaful Limited
+PAKRI	Pakistan Reinsurance Company Limited
+PAKT	Pakistan Tobacco Company Limited
+PASL	Pervez Ahmed Consultancy Services Ltd.
+PASM	Paramount Spinning Mills Limited
+PCAL	Pakistan Cables Limited
+PECO	Pakistan Engineering Company Limited
+PGLC	Pak-Gulf Leasing Company Limited
+PHDL	Pakistan Hotels Developers Limited
+PIAHCLA	PIA Holding Company Limited
+PIAHCLB	PIA Holding Company LimitedB
+PIBTL	Pakistan International Bulk Terminal
+PICL	Pakistan Industrial & Commercial Leasing
+PICT	Pakistan International Container
+PIL	PICIC Insurance Limited
+PIM	Popular Islamic Modaraba
+PINL	Premier Insurance Limited
+PIOC	Pioneer Cement Limited
+PKGI	The Pakistan General Insurance Co. Ltd.
+PKGP	Pakgen Power Limited
+PKGS	Packages Limited
+PMRS	The Premier Sugar Mills
+PNSC	Pakistan National Shipping Corporation
+POL	Pakistan Oilfields Limited
+POML	Punjab Oil Mills Limited
+POWER	Power Cement Limited
+POWERPS	Power Cement (Pref)
+PPL	Pakistan Petroleum Limited
+PPP	Pakistan Paper Products Limited
+PPVC	Pakistan PVC Limited
+PQGTL	Pak Qatar General Takaful Limited
+PREMA	At-Tahur Limited
+PRET	Premium Textile Mills Limited
+PRIB	Prudential Investment Bank Limited
+PRIC	Progressive Insurance Company Limited
+PRL	Pakistan Refinery Limited
+PRWM	Prosperity Weaving Mills Limited
+PSEL	Pakistan Services Limited
+PSO	Pakistan State Oil Company Limited
+PSX	Pakistan Stock Exchange Limited
+PSYL	Pakistan Synthetics Limited
+PTC	Pakistan Telecommunication Company Ltd
+PTL	Panther Tyres Ltd.
+PUDF	Prudential Stocks Fund Limited
+QTECH	Quantum Data Technologies Limited
+QUET	Quetta Textile Mills Limited
+QUICE	Quice Food Industries Limited
+RCML	Reliance Cotton Spinning Mills Limited
+REDCO	Redco Textiles Limited
+REGAL	Regal Ceramics Limited
+REWM	Reliance Weaving Mills Limited
+RICL	Reliance Insurance Company Limited
+RMPL	Rafhan Maize Products Company Limited
+RPL	Roshan Packages Limited
+RUBY	Ruby Textile Mills Limited
+RUPL	Rupali Polyester Limited
+SAIF	Saif Textile Mills Limited
+SANE	Salman Noman Enterprises Limited
+SANSM	Sanghar Sugar Mills Limited
+SAPT	Sapphire Textile Mills Limited
+SARC	Sardar Chemical Industries Limited
+SASML	Sindh Abadgars Sugar Mills Limited
+SAZEW	Sazgar Engineering Works Limited
+SBL	Samba Bank Limited
+SCBPL	Standard Chartered Bank (Pak) Ltd
+SCL	Shield Corporation Limited
+SDOT	Sadoon Textile Industries Limited
+SEARL	The Searle Company Limited
+SEL	Sitara Energy Limited
+SEPL	Security Papers Limited
+SERT	Service Industries Textiles Limited
+SFAT	Safa Textiles Limited
+SFL	Sapphire Fibres Limited
+SGABL	SG.Allied Businesses Limited
+SGF	Service GlobalFootwear Limited
+SGPL	S.G. Power Limited
+SHCI	Shaffi Chemical Industries Limited
+SHCM	Shadman Cotton Mills Limited
+SHDT	Shadab Textile Mills Limited
+SHEZ	Shezan International Limited
+SHFA	Shifa International Hospitals Limited
+SHJS	Shahtaj Sugar Mills Limited
+SHNI	Shaheen Insurance Company Limited
+SHSML	Shahmurad Sugar Mills Limited
+SIBL	Security Investment Bank Limited
+SIEM	Siemens (Pakistan) Engineering
+SINDM	Sindh Modaraba
+SITC	Sitara Chemical Industries Limited
+SKRS	Sakrand Sugar Mills Limited
+SLCL	Security Leasing Corporation Limited
+SLCPA	Security Leasing Corp.9.10%(Pref)
+SLGL	Secure Logistics-Trax Group Limited
+SLL	SME Leasing Limited
+SLYT	Sally Textile Mills Limited
+SMCPL	Safe Mix Concrete Limited
+SML	Shakarganj Limited
+SNAI	Sana Industries Limited
+SNBL	Soneri Bank Limited
+SNGP	Sui Northern Gas Pipelines Limited
+SPCL	Saudi Pak Consultancy Company Limited
+SPEL	SPEL Limited
+SPL	Sitara Peroxide Limited
+SPWL	Saif Power Limited
+SRR	Signature Residency Reit
+SRVI	Service Industries Limited
+SSGC	Sui Southern Gas Company Limited
+SSIC	Silver Star Insurance Company Limited
+SSML	Saritow Spinning Mills Limited
+SSOM	S.S.Oil Mills Limited
+STCL	Shabbir Tiles & Ceramics Limited
+STJT	Shahtaj Textile Limited
+STL	Supernet Technologies Limited
+STML	Shams Textile Mills Limited
+STPL	Siddiqsons Tin Plate Limited
+STYLERS	Stylers International Limited
+SUHJ	Suhail Jute Mills Limited
+SURAJ	Suraj Ghee Industries Limited
+SURC	Suraj Cotton Mills Limited
+SUTM	Sunrays Textile Mills Limited
+SWL	Standard Worldwide Limited
+SYM	Symmetry Group Limited
+SYS	Systems Limited
+SZTM	Shahzad Textile Mills Limited
+TAJT	Taj Textile Mills Limited
+TATM	Tata Textile Mills Limited
+TBL	Treet Battery Limited.
+TCORP	Tariq Corporation Limited
+TCORPCPS	Tariq Corporation Limited(Pref)
+TELE	Telecard Limited
+TGL	Tariq Glass Industries Limited
+THALL	Thal Limited
+THCCL	Thatta Cement Company Limited
+TICL	The Thal Industries Corporation Limited
+TOMCL	The Organic Meat Company Limited
+TOWL	Towellers Limited
+TPL	TPL Corp Limited
+TPLI	TPL Insurance Limited
+TPLL	TPL Life Insurance Limited
+TPLP	TPL Properties Limited
+TPLRF1	TPL REIT Fund I
+TPLT	TPL Trakker Limited
+TREET	Treet Corporation Limited
+TRG	TRG Pakistan Limited
+TRIBL	Trust Investment Bank Limited
+TRIPF	Tri-Pack Films Limited
+TRSM	Trust Modaraba
+TSBL	Trust Securities & Brokerage Limited
+TSMF	Tri-Star Mutual Fund Limited
+TSML	Tandlianwala Sugar Mills Limited
+TSPL	Tri-Star Power Limited
+UBDL	United Brands Limited
+UBL	United Bank Limited
+UCAPM	Unicap Modaraba
+UDLI	UDL International Limited
+UDPL	United Distributors Pakistan Limited
+UNIC	The United Insurance Company
+UNITY	Unity Foods Limited
+UPFL	Unilever Pakistan Foods Limited
+USMT	Usman Textile Mills Limited
+UVIC	The Universal Insurance Company Limited
+WAFI	Wafi Energy Pakistan Limited
+WAHN	Wah Noble Chemicals Limited
+WASL	Wasl Mobility Modaraba
+WAVES	Waves Corporation Limited
+WAVESAPP	Waves Home Appliances Limited
+WTL	Worldcall Telecom Limited
+YOUW	Yousaf Weaving Mills Limited
+ZAHID	Zahidjee Textile Mills Limited
+ZAL	Zarea Limited
+ZELP	Zeal Pak Cement Factory Limited
+ZIL	ZIL Limited
+ZTL	Zephyr Textiles Limited
+ZUMA	Zuma Resources Limited
+

@@ -26,12 +26,31 @@ export const config = {
   performersCachePath: normalizePath(process.env.MARKET_PERFORMERS_CACHE_PATH, path.resolve(ROOT, 'server/cache/market_performers.json')),
   performersCacheMinutes: Number(process.env.MARKET_PERFORMERS_CACHE_MINUTES || 30),
   groqApiKey: process.env.GROQ_API_KEY || '',
+  groqApiKeys: (() => {
+    const inline = String(process.env.GROQ_API_KEYS || '');
+    const parsed = inline
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean);
+    const single = String(process.env.GROQ_API_KEY || '').trim();
+    return Array.from(new Set([...(single ? [single] : []), ...parsed]));
+  })(),
   groqModel: process.env.GROQ_MODEL || 'llama-3.1-8b-instant',
+  mainChatProvider: process.env.MAIN_CHAT_PROVIDER || 'groq',
+  geminiApiKey: process.env.GEMINI_API_KEY || '',
+  geminiChatModel: process.env.GEMINI_CHAT_MODEL || 'gemini-2.0-flash',
+  geminiChatTimeoutMs: Number(process.env.GEMINI_CHAT_TIMEOUT_MS || 60000),
+  geminiIntentModel: process.env.GEMINI_INTENT_MODEL || 'gemini-2.0-flash-lite',
+  enableGeminiIntentGuard: !['0', 'false', 'no'].includes(String(process.env.ENABLE_GEMINI_INTENT_GUARD || 'false').toLowerCase()),
+  geminiIntentTimeoutMs: Number(process.env.GEMINI_INTENT_TIMEOUT_MS || 3500),
+  /** RAG chat creativity; override with GROQ_TEMPERATURE (0–2). */
+  groqTemperature: (() => {
+    const raw = process.env.GROQ_TEMPERATURE;
+    const t = raw === undefined || raw === '' ? 0.6 : Number(raw);
+    return Number.isFinite(t) ? Math.min(2, Math.max(0, t)) : 0.6;
+  })(),
   jwtSecret: process.env.JWT_SECRET_KEY || process.env.SECRET_KEY || 'change-me-jwt-secret',
   jwtExpiresHours: Number(process.env.JWT_ACCESS_TOKEN_EXPIRES_HOURS || 12),
-  googleClientId: process.env.GOOGLE_CLIENT_ID || '',
-  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-  googleRedirectUri: process.env.GOOGLE_REDIRECT_URI || 'http://127.0.0.1:5001/api/auth/google/callback',
   startupHistoricalSync: !['0', 'false', 'no'].includes(String(process.env.STARTUP_HISTORICAL_SYNC || 'true').toLowerCase()),
   focusSymbolsXlsxPath: normalizePath(process.env.FOCUS_SYMBOLS_XLSX_PATH, path.resolve(ROOT, '..', 'Stocks and symbols.xlsx')),
   focusRefreshLimit: Number(process.env.FOCUS_REFRESH_LIMIT || 200),
@@ -52,6 +71,6 @@ export const config = {
   marketSummaryWarmupDays: Number(process.env.MARKET_SUMMARY_WARMUP_DAYS || 365),
   incrementalCsvPath: normalizePath(
     process.env.INCREMENTAL_CSV_PATH,
-    path.resolve(ROOT, '..', 'new_psx_historical_.csv')
+    path.resolve(ROOT, 'data', 'new_psx_historical_.csv')
   )
 };

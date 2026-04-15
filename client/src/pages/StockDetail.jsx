@@ -344,7 +344,12 @@ export default function StockDetail() {
               compactNews.map((item, i) => (
                 <div key={i} className="p-4">
                   <p className="text-slate-200 text-sm font-medium">{item.headline}</p>
-                  {item.summary && <p className="text-slate-400 text-xs mt-1">{item.summary}</p>}
+                  {item.summary && (
+                    <div 
+                      className="text-slate-400 text-xs mt-1 line-clamp-3 overflow-hidden [&_a]:text-brand-400 [&_a]:hover:underline [&_strong]:text-slate-200 [&_em]:italic [&_ul]:list-disc [&_ul]:pl-4 [&_p]:mb-1 [&_p:last-child]:mb-0"
+                      dangerouslySetInnerHTML={{ __html: item.summary }}
+                    />
+                  )}
                   <p className="text-slate-500 text-xs mt-1">
                     {item.sentiment} (score: {item.score}) · {item.source}
                   </p>

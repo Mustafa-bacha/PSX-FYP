@@ -150,7 +150,14 @@ stocksRouter.get('/news/daily', async (req, res) => {
     const rows = db.prepare(`
       SELECT headline, source, label, score, analyzed_at
       FROM sentiment
-      WHERE source IN ('dawn_business', 'business_recorder', 'tribune_business', 'profit_pakistantoday')
+      WHERE source IN (
+        'dawn_business',
+        'business_recorder',
+        'tribune_business',
+        'profit_pakistantoday',
+        'bbc_business',
+        'al_jazeera_economy'
+      )
         AND headline IS NOT NULL
         AND TRIM(headline) <> ''
         AND LOWER(TRIM(headline)) NOT LIKE 'daily sentiment scan%'
@@ -181,12 +188,24 @@ stocksRouter.get('/news/daily', async (req, res) => {
   }
 });
 
+function normalizeChatQuestion(raw) {
+  if (raw == null) return '';
+  if (typeof raw === 'string') return raw.trim();
+  if (typeof raw === 'object') {
+    const t = raw.text ?? raw.content ?? raw.message ?? raw.query ?? raw.body;
+    if (typeof t === 'string') return t.trim();
+  }
+  const s = String(raw).trim();
+  return s === '[object Object]' ? '' : s;
+}
+
 stocksRouter.post('/chat', optionalAuth, async (req, res) => {
   const isMalformedDb = (err) => String(err?.message || err || '').toLowerCase().includes('database disk image is malformed');
   try {
-    const { stock, question, history } = req.body || {};
+    const { stock, history } = req.body || {};
+    const question = normalizeChatQuestion(req.body?.question);
     if (!question) {
-      return res.status(400).json({ error: 'question is required' });
+      return res.status(400).json({ error: 'question is required (non-empty string)' });
     }
 
     const scope = String(stock || 'MARKET').toUpperCase();

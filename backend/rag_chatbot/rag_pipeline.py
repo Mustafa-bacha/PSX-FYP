@@ -24,27 +24,23 @@ class RAGResult:
 # ---------------------------------------------------------------------------
 
 _BUY_SELL_PATTERNS = re.compile(
-    r"\b(buy|sell|hold|invest|entry|exit|position|trade|purchase|accumulate|book\s*profit|should\s*i)\b",
+    r"\b(buy|sell|hold|invest|entry|exit|position|trade|purchase|accumulate|book\s*profit)\b",
     re.IGNORECASE,
 )
 _OUTLOOK_PATTERNS = re.compile(
-    r"\b(outlook|forecast|predict|expect|future|ahead|coming|next\s*week|next\s*month|tomorrow|this\s*week)\b",
+    r"\b(outlook|forecast|predict|expect|future|ahead|coming|next\s*week|next\s*month|tomorrow)\b",
     re.IGNORECASE,
 )
 _HISTORY_PATTERNS = re.compile(
-    r"\b(histor|past|previous|trend|perform|return|track\s*record|how\s*(has|did|was)|weekly|monthly|last\s*\d+)\b",
+    r"\b(histor|past|previous|trend|perform|return|track\s*record|how\s*(has|did|was))\b",
     re.IGNORECASE,
 )
 _NEWS_PATTERNS = re.compile(
-    r"\b(news|headline|sentiment|rumor|report|analyst|rating|upgrade|downgrade|announcement|filing|dividend)\b",
+    r"\b(news|headline|sentiment|rumor|report|analyst|rating|upgrade|downgrade)\b",
     re.IGNORECASE,
 )
 _RISK_PATTERNS = re.compile(
-    r"\b(risk|danger|concern|warn|threat|downside|volatil|caution|red\s*flag|worst\s*case|stop\s*loss)\b",
-    re.IGNORECASE,
-)
-_FUNDAMENTAL_PATTERNS = re.compile(
-    r"\b(fundamental|eps|p/e|pe\s*ratio|revenue|profit|loss|book\s*value|dividend|market\s*cap|financ|balance\s*sheet|earning)\b",
+    r"\b(risk|danger|concern|warn|threat|downside|volatil|caution|red\s*flag)\b",
     re.IGNORECASE,
 )
 
@@ -54,8 +50,6 @@ def classify_question(question: str) -> str:
     q = question.lower().strip()
     if _BUY_SELL_PATTERNS.search(q):
         return "recommendation"
-    if _FUNDAMENTAL_PATTERNS.search(q):
-        return "fundamentals"
     if _OUTLOOK_PATTERNS.search(q):
         return "outlook"
     if _HISTORY_PATTERNS.search(q):
@@ -74,7 +68,7 @@ def classify_question(question: str) -> str:
 
 class StockRAGPipeline:
     # Chroma L2 distance threshold — docs beyond this are noise
-    RELEVANCE_THRESHOLD = 1.6
+    RELEVANCE_THRESHOLD = 1.4
 
     def __init__(self) -> None:
         self.embedder = EmbeddingService()
@@ -116,7 +110,7 @@ class StockRAGPipeline:
             "stock_count": len(unique_stocks),
         }
 
-    # ── retrieval helpers ──────────────────────────────────���──────────────
+    # ── retrieval helpers ─────────────────────────────────────────────────
 
     @staticmethod
     def _tokenize(text: str) -> set[str]:
@@ -136,51 +130,34 @@ class StockRAGPipeline:
     ) -> list[dict]:
         """Generate multiple query variants and merge results for better recall."""
         stock_filter = stock if stock and stock not in {"MARKET", "GENERAL", "ALL", ""} else None
-        is_market = stock in {"MARKET", "GENERAL", "ALL", ""}
 
         # Build query variants based on question type
         queries = [f"{stock} stock: {question}"]
 
         if question_type == "recommendation":
-            queries.append(f"{stock} trend analysis momentum buy sell signal support resistance key levels RSI")
-            queries.append(f"{stock} sentiment news outlook risk volume analysis")
-            queries.append(f"{stock} price action weekly performance recent sessions")
+            queries.append(f"{stock} trend analysis momentum buy sell signal support resistance")
+            queries.append(f"{stock} sentiment news outlook risk")
         elif question_type == "outlook":
-            queries.append(f"{stock} trend momentum moving average direction weekly monthly")
-            queries.append(f"{stock} news sentiment forecast upcoming catalyst")
-            queries.append(f"{stock} key levels support resistance breakout")
+            queries.append(f"{stock} trend momentum moving average direction")
+            queries.append(f"{stock} news sentiment forecast")
         elif question_type == "historical":
-            queries.append(f"{stock} historical profile price range performance returns all-time")
-            queries.append(f"{stock} trend multi-timeframe 5 20 60 session return weekly monthly")
-            queries.append(f"{stock} price action volume analysis historical volatility")
+            queries.append(f"{stock} historical profile price range performance returns")
+            queries.append(f"{stock} trend multi-timeframe 5 20 60 session return")
         elif question_type == "news_sentiment":
-            queries.append(f"{stock} sentiment positive negative news headlines analysis trend")
-            queries.append(f"{stock} latest news analyst report announcement PSX filing")
-            queries.append(f"{stock} corporate announcement dividend earnings report")
+            queries.append(f"{stock} sentiment positive negative news headlines")
+            queries.append(f"{stock} latest news analyst report")
         elif question_type == "risk":
-            queries.append(f"{stock} risk volatility decline downside bearish stop loss")
-            queries.append(f"{stock} sentiment negative concern warning threat")
-            queries.append(f"{stock} support breakdown key levels volume decline")
-        elif question_type == "fundamentals":
-            queries.append(f"{stock} fundamentals EPS P/E ratio book value market cap revenue")
-            queries.append(f"{stock} PSX company profile sector industry financial highlights")
-            queries.append(f"{stock} dividend earnings announcement corporate action")
+            queries.append(f"{stock} risk volatility decline downside bearish")
+            queries.append(f"{stock} sentiment negative concern warning")
         else:
-            queries.append(f"{stock} historical trend price close volume analysis")
-            queries.append(f"{stock} sentiment news analysis latest headlines")
-            queries.append(f"{stock} key levels support resistance fundamentals profile")
-
-        # For MARKET scope, add market-wide queries
-        if is_market:
-            queries.append("PSX market breadth advancers decliners average change")
-            queries.append("PSX top gainers losers most active volume")
-            queries.append("market trend multi-day improving deteriorating")
+            queries.append(f"{stock} historical trend price close volume")
+            queries.append(f"{stock} sentiment news analysis")
 
         # Add conversational context query
         if history:
             last_msg = history[-1].get("content", "")
             if last_msg:
-                queries.append(f"{stock} {last_msg[:200]}")
+                queries.append(f"{stock} {last_msg[:150]}")
 
         # Embed all queries at once
         query_vecs = self.embedder.embed(queries)
@@ -192,16 +169,7 @@ class StockRAGPipeline:
         for qvec in query_vecs:
             results = self.store.query(qvec, top_k=candidate_count, stock_filter=stock_filter)
             for doc in results:
-                text_key = str(doc.get("text", ""))[:120]
-                if text_key not in seen_texts:
-                    seen_texts.add(text_key)
-                    merged.append(doc)
-
-        # For MARKET scope, also query without filter to get market-wide docs
-        if is_market and query_vecs:
-            market_results = self.store.query(query_vecs[0], top_k=candidate_count, stock_filter=None)
-            for doc in market_results:
-                text_key = str(doc.get("text", ""))[:120]
+                text_key = str(doc.get("text", ""))[:100]
                 if text_key not in seen_texts:
                     seen_texts.add(text_key)
                     merged.append(doc)
@@ -228,43 +196,14 @@ class StockRAGPipeline:
         question_tokens = self._tokenize(question)
         stock = (stock or "").strip().upper()
 
-        # Question-type-specific doc_type preferences (now includes new doc types)
+        # Question-type-specific doc_type preferences
         type_boosts: dict[str, dict[str, float]] = {
-            "recommendation": {
-                "trend": 0.25, "price_action": 0.20, "sentiment": 0.15,
-                "historical": 0.10, "news": 0.12, "report": 0.08,
-                "fundamentals": 0.12, "announcement": 0.10,
-            },
-            "outlook": {
-                "trend": 0.25, "sentiment": 0.20, "news": 0.18,
-                "price_action": 0.15, "historical": 0.08, "report": 0.06,
-                "fundamentals": 0.08, "announcement": 0.10,
-            },
-            "historical": {
-                "historical": 0.25, "trend": 0.22, "price_action": 0.18,
-                "report": 0.10, "sentiment": 0.05, "news": 0.04,
-                "fundamentals": 0.08, "announcement": 0.04,
-            },
-            "news_sentiment": {
-                "news": 0.25, "sentiment": 0.25, "announcement": 0.18,
-                "report": 0.12, "trend": 0.05, "historical": 0.04,
-                "price_action": 0.03, "fundamentals": 0.08,
-            },
-            "risk": {
-                "sentiment": 0.22, "news": 0.20, "trend": 0.18,
-                "price_action": 0.15, "historical": 0.08, "report": 0.06,
-                "fundamentals": 0.06, "announcement": 0.10,
-            },
-            "fundamentals": {
-                "fundamentals": 0.30, "announcement": 0.22, "report": 0.15,
-                "historical": 0.08, "trend": 0.05, "news": 0.08,
-                "sentiment": 0.05, "price_action": 0.03,
-            },
-            "general": {
-                "trend": 0.18, "historical": 0.15, "sentiment": 0.12,
-                "news": 0.10, "price_action": 0.12, "report": 0.08,
-                "fundamentals": 0.10, "announcement": 0.08,
-            },
+            "recommendation": {"trend": 0.25, "price_action": 0.20, "sentiment": 0.15, "historical": 0.10, "news": 0.12, "report": 0.08},
+            "outlook":        {"trend": 0.25, "sentiment": 0.20, "news": 0.18, "price_action": 0.12, "historical": 0.08, "report": 0.06},
+            "historical":     {"historical": 0.25, "trend": 0.22, "price_action": 0.18, "report": 0.10, "sentiment": 0.05, "news": 0.04},
+            "news_sentiment": {"news": 0.25, "sentiment": 0.25, "report": 0.12, "trend": 0.05, "historical": 0.04, "price_action": 0.03},
+            "risk":           {"sentiment": 0.22, "news": 0.20, "trend": 0.18, "price_action": 0.12, "historical": 0.08, "report": 0.06},
+            "general":        {"trend": 0.18, "historical": 0.15, "sentiment": 0.12, "news": 0.10, "price_action": 0.10, "report": 0.08},
         }
         boosts = type_boosts.get(question_type, type_boosts["general"])
 
@@ -279,9 +218,6 @@ class StockRAGPipeline:
 
             # Stock match
             scope_match = 1.0 if stock and stock not in {"", "MARKET", "GENERAL"} and doc_stock == stock else 0.0
-            # For MARKET queries, boost MARKET docs
-            if stock in {"MARKET", "GENERAL", ""} and doc_stock == "MARKET":
-                scope_match = 0.8
 
             # Fallback penalty
             is_fallback = metadata.get("_unfiltered_fallback", False)
@@ -301,17 +237,13 @@ class StockRAGPipeline:
             vector_distance = float(d.get("score") or 0.0)
             vector_relevance = 1.0 / (1.0 + max(0.0, vector_distance))
 
-            # Recency boost: prefer docs with published_at
-            recency_boost = 0.03 if metadata.get("published_at") else 0.0
-
             score = (
-                (vector_relevance * 0.35)
-                + (0.05 * min(overlap, 6))
+                (vector_relevance * 0.40)
+                + (0.05 * min(overlap, 5))
                 + (0.25 * scope_match)
                 + ticker_in_text
                 + priority
                 + fallback_penalty
-                + recency_boost
             )
             ranked.append((score, d))
 
@@ -325,12 +257,10 @@ class StockRAGPipeline:
         positives = [
             "growth", "strong", "resilient", "upgrade", "profit", "positive",
             "bullish", "surge", "outperform", "gain", "rally", "optimistic",
-            "improving", "golden cross", "breakout", "accumulate",
         ]
         negatives = [
             "decline", "risk", "loss", "volatility", "downgrade", "negative",
             "bearish", "concern", "warning", "weak", "drop", "pessimistic",
-            "deteriorating", "death cross", "breakdown", "distribution",
         ]
 
         pos = sum(blob.count(w) for w in positives)
@@ -356,22 +286,17 @@ class StockRAGPipeline:
             by_type.setdefault(doc_type, []).append(entry)
 
         type_labels = {
-            "historical": "HISTORICAL DATA & PROFILE",
-            "trend": "TREND & TECHNICAL ANALYSIS",
-            "price_action": "RECENT PRICE ACTION & VOLUME",
+            "historical": "HISTORICAL DATA",
+            "trend": "TREND ANALYSIS",
+            "price_action": "RECENT PRICE ACTION",
             "sentiment": "SENTIMENT ANALYSIS",
             "news": "NEWS HEADLINES",
             "report": "ANALYST REPORTS",
-            "fundamentals": "COMPANY FUNDAMENTALS (PSX)",
-            "announcement": "CORPORATE ANNOUNCEMENTS & FILINGS",
         }
 
         sections: list[str] = []
-        # Order: fundamentals first, then trend/price, then historical, sentiment, news, announcements, reports
-        for dtype in [
-            "fundamentals", "trend", "price_action", "historical",
-            "sentiment", "news", "announcement", "report", "other",
-        ]:
+        # Order: trend/price first (most actionable), then historical, sentiment, news, reports
+        for dtype in ["trend", "price_action", "historical", "sentiment", "news", "report", "other"]:
             entries = by_type.get(dtype, [])
             if not entries:
                 continue
@@ -384,12 +309,12 @@ class StockRAGPipeline:
 
     # ── main ask method ───────────────────────────────────────────────────
 
-    def ask(self, stock: str, question: str, history: list[dict], top_k: int = 10) -> RAGResult:
+    def ask(self, stock: str, question: str, history: list[dict], top_k: int = 5) -> RAGResult:
         stock = (stock or "").strip().upper()
         question_type = classify_question(question)
 
-        # Multi-query retrieval for better recall — fetch more candidates
-        candidate_count = max(top_k * 5, 30)
+        # Multi-query retrieval for better recall
+        candidate_count = max(top_k * 4, 20)
         all_candidates = self._multi_query_retrieve(
             stock=stock,
             question=question,
@@ -405,7 +330,7 @@ class StockRAGPipeline:
         ]
 
         # Rerank with question-type awareness — retrieve more for richer context
-        effective_top_k = max(top_k, 14)
+        effective_top_k = max(top_k, 8)
         retrieved = self._rerank(
             question=question,
             stock=stock,
@@ -417,7 +342,7 @@ class StockRAGPipeline:
         # Assemble structured context
         context_block = self._assemble_context(retrieved)
         history_block = "\n".join(
-            [f"{m.get('role', 'user')}: {m.get('content', '')}" for m in history[-10:]]
+            [f"{m.get('role', 'user')}: {m.get('content', '')}" for m in history[-8:]]
         )
 
         prompt = build_prompt(
