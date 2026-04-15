@@ -24,14 +24,14 @@ npm-debug.log*
 server/cache/*.json
 
 # Data/artifacts (keep lightweight sample files only if needed)
-models/
-data/*
-!data/.gitkeep
-data/rag_vector_store/
-data/rag_cache/
-data/reports/
-data/*.db
-data/*.sqlite
+/models/
+/data/*
+!/data/.gitkeep
+/data/rag_vector_store/
+/data/rag_cache/
+/data/reports/
+/data/*.db
+/data/*.sqlite
 
 # OS/editor
 .DS_Store
