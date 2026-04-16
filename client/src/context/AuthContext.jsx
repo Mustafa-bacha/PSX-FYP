@@ -3,6 +3,7 @@ import { getToken } from '../api.js';
 import { apiClient } from '../api/client.js';
 
 const AuthContext = createContext(null);
+const OAUTH_JUST_LOGGED_KEY = 'oauth_just_logged_in';
 
 function persistToken(token) {
   if (!token) {
@@ -35,11 +36,49 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const oauthToken = params.get('token');
+      const oauthEmail = params.get('email');
+      const oauthName = params.get('name');
+      const oauthError = params.get('error');
+
+      if (oauthError) {
+        setLoading(false);
+        return;
+      }
+
+      if (oauthToken) {
+        const nextUser = { email: oauthEmail || '', full_name: oauthName || '' };
+        login(nextUser, oauthToken);
+        try {
+          sessionStorage.setItem(OAUTH_JUST_LOGGED_KEY, '1');
+        } catch {
+          // ignore storage issues
+        }
+        window.history.replaceState({}, '', '/');
+        setLoading(false);
+        return;
+      }
+
       const savedToken = getToken();
       const savedUser = localStorage.getItem('user');
       if (!savedToken || !savedUser) {
         setLoading(false);
         return;
+      }
+
+      try {
+        const justLoggedInWithOAuth = sessionStorage.getItem(OAUTH_JUST_LOGGED_KEY) === '1';
+        if (justLoggedInWithOAuth) {
+          const parsed = JSON.parse(savedUser);
+          setUser(parsed || null);
+          setToken(savedToken);
+          sessionStorage.removeItem(OAUTH_JUST_LOGGED_KEY);
+          setLoading(false);
+          return;
+        }
+      } catch {
+        // continue with normal verification
       }
 
       try {
