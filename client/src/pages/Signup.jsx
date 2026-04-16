@@ -44,7 +44,7 @@ export default function Signup() {
 
     setLoading(true);
     try {
-      await auth.register(email, password, confirmPassword, {
+      await auth.register(email, password, {
         full_name: fullName.trim(),
         date_of_birth: dateOfBirth,
       });
@@ -147,6 +147,22 @@ export default function Signup() {
             {loading ? 'Creating account...' : 'Sign up'}
           </button>
         </form>
+
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center" aria-hidden="true">
+            <div className="w-full border-t border-slate-700/70"></div>
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-slate-900 px-2 text-slate-500">or</span>
+          </div>
+        </div>
+
+        <a
+          href={auth.googleStartUrl()}
+          className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-slate-600 bg-slate-800/80 px-4 py-3 text-lg font-semibold text-slate-100 hover:bg-slate-700/80 hover:border-slate-500 transition-colors"
+        >
+          Continue with Google
+        </a>
 
         <p className="mt-5 text-slate-400 text-sm text-center">
           Already have an account? <Link to="/login" className="text-brand-400 hover:underline">Log in</Link>

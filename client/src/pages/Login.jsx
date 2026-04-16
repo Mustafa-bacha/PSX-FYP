@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { auth } from '../api.js';
 import { inputClass, labelClass, btnPrimaryClass, cardClass } from '../lib/constants.js';
@@ -11,6 +11,19 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const oauthError = params.get('oauth_error');
+    const oauthMessage = params.get('oauth_message');
+    if (!oauthError) return;
+
+    const text = oauthMessage
+      ? `Google sign-in failed: ${oauthMessage}`
+      : 'Google sign-in failed. Please try again.';
+    setError(text);
+  }, [location.search]);
 
   if (isAuthenticated) {
     return <Navigate to="/" replace />;
@@ -85,6 +98,22 @@ export default function Login() {
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
+
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center" aria-hidden="true">
+            <div className="w-full border-t border-slate-700/70"></div>
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-slate-900 px-2 text-slate-500">or</span>
+          </div>
+        </div>
+
+        <a
+          href={auth.googleStartUrl()}
+          className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-slate-600 bg-slate-800/80 px-4 py-3 text-lg font-semibold text-slate-100 hover:bg-slate-700/80 hover:border-slate-500 transition-colors"
+        >
+          Continue with Google
+        </a>
 
         <p className="mt-5 text-slate-400 text-sm text-center">
           Don&apos;t have an account? <Link to="/signup" className="text-brand-400 hover:underline">Sign up</Link>

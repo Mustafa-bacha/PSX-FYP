@@ -32,8 +32,11 @@ export function normalizeEmail(value) {
 
 export function validatePasswordStrength(password) {
   const raw = String(password || '');
-  if (raw.length < 6) {
-    return 'Password must be at least 6 characters.';
+  if (raw.length < 8) {
+    return 'Password must be at least 8 characters.';
+  }
+  if (!/[A-Z]/.test(raw) || !/[a-z]/.test(raw) || !/[0-9]/.test(raw)) {
+    return 'Password must include uppercase, lowercase, and a number.';
   }
   return '';
 }

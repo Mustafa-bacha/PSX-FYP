@@ -208,10 +208,7 @@ function NewsCard({ item, showSymbol }) {
       </h3>
 
       {item.summary && (
-        <div 
-          className="text-slate-300 text-sm leading-6 mb-4 flex-1 line-clamp-4 overflow-hidden [&_a]:text-brand-400 [&_a]:hover:underline [&_strong]:text-white [&_em]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mb-2 [&_p:last-child]:mb-0"
-          dangerouslySetInnerHTML={{ __html: item.summary }}
-        />
+        <p className="text-slate-300 text-sm leading-6 mb-4 flex-1">{item.summary}</p>
       )}
 
       <div className="mt-auto flex items-center justify-between gap-3">

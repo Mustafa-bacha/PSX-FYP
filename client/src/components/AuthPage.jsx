@@ -4,9 +4,7 @@ import { apiClient } from '../api/client.js';
 export function AuthPage({ onAuthSuccess }) {
   const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -17,29 +15,8 @@ export function AuthPage({ onAuthSuccess }) {
     setError('');
 
     try {
-      if (mode === 'signup') {
-        if (!fullName.trim()) {
-          throw new Error('Full name is required');
-        }
-        if (!dateOfBirth) {
-          throw new Error('Date of birth is required');
-        }
-        if (password.length < 6) {
-          throw new Error('Password must be at least 6 characters');
-        }
-        if (password !== confirmPassword) {
-          throw new Error('Passwords do not match');
-        }
-      }
-
       const payload = mode === 'signup'
-        ? await apiClient.signup({
-          email,
-          password,
-          confirm_password: confirmPassword,
-          full_name: fullName,
-          date_of_birth: dateOfBirth
-        })
+        ? await apiClient.signup({ email, password, full_name: fullName })
         : await apiClient.login({ email, password });
 
       onAuthSuccess(payload.token, payload.user);
@@ -75,18 +52,6 @@ export function AuthPage({ onAuthSuccess }) {
             </label>
           )}
 
-          {mode === 'signup' && (
-            <label>
-              Date of Birth
-              <input
-                type="date"
-                value={dateOfBirth}
-                onChange={(e) => setDateOfBirth(e.target.value)}
-                required
-              />
-            </label>
-          )}
-
           <label>
             Email
             <input
@@ -112,21 +77,7 @@ export function AuthPage({ onAuthSuccess }) {
           </label>
 
           {mode === 'signup' && (
-            <label>
-              Confirm Password
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••"
-                autoComplete="new-password"
-                required
-              />
-            </label>
-          )}
-
-          {mode === 'signup' && (
-            <small className="muted-line">Use at least 6 characters.</small>
+            <small className="muted-line">Use at least 8 chars with uppercase, lowercase, and number.</small>
           )}
 
           {error && <div className="error-box">{error}</div>}
@@ -135,6 +86,12 @@ export function AuthPage({ onAuthSuccess }) {
             {loading ? 'Please wait…' : mode === 'signup' ? 'Create account' : 'Sign in'}
           </button>
         </form>
+
+  <div className="auth-divider"><span>or</span></div>
+
+        <a className="google-btn" href={apiClient.googleStartUrl()}>
+          Continue with Google
+        </a>
       </section>
     </main>
   );
