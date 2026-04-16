@@ -64,17 +64,15 @@ export const auth = {
       access_token: token
     };
   },
-  async register(email, password, profile = {}) {
+  async register(email, password, confirmPassword, profile = {}) {
     return apiClient.signup({
       email,
       password,
+      confirm_password: confirmPassword,
       full_name: String(profile?.full_name || '').trim(),
       date_of_birth: profile?.date_of_birth || null,
     });
-  },
-  googleStartUrl() {
-    return apiClient.googleStartUrl();
-  },
+  }
 };
 
 export const stocks = {

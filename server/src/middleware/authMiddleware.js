@@ -3,7 +3,7 @@ import { db } from '../lib/db.js';
 
 function findUserById(id) {
   return db.prepare(`
-    SELECT id, email, full_name, provider, created_at, updated_at, last_login_at, avatar_url
+    SELECT id, email, full_name, date_of_birth, provider, created_at, updated_at, last_login_at, avatar_url
     FROM users
     WHERE id = ?
   `).get(Number(id));

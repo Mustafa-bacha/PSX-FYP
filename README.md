@@ -13,7 +13,6 @@ Core JS endpoints:
 - `POST /api/auth/signup`
 - `POST /api/auth/login`
 - `GET /api/auth/me` (Bearer token)
-- `GET /api/auth/google/start` (Google OAuth redirect)
 - `GET /api/stocks`
 - `GET /api/stock/:symbol?days=365`
 - `GET /api/stock/:symbol/insights`
@@ -34,18 +33,38 @@ Open:
 - React app: `http://127.0.0.1:5173`
 - Express API: `http://127.0.0.1:5001/api/health`
 
+### Safe one-command deploy (EC2)
+
+For constrained instances, use the included safe deploy script. It pulls latest code, restarts services, and waits/retries until health endpoints are ready.
+
+On the EC2 host (inside `/home/ubuntu/PSX-FYP`):
+
+```bash
+bash deploy-safe.sh
+```
+
+Optional full refresh (dependencies + client build):
+
+```bash
+DEPLOY_FULL=1 bash deploy-safe.sh
+```
+
+Notes:
+- Default mode is fast and free-tier friendly.
+- Full mode is slower but useful after dependency changes.
+
 Environment:
 
 - Copy `.env.example` to `.env` and set `GROQ_API_KEY`.
 - Set `JWT_SECRET_KEY` for production.
-- For Google login, set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_REDIRECT_URI`.
 - Copy `client/.env.example` to `client/.env` if you need custom API base URL.
+- Built-in admin login (hardcoded): `hussan33@gmail.com` / `stockfull`.
 
 ### Production readiness checklist
 
 - Use unique strong values for `SECRET_KEY`, `JWT_SECRET_KEY`, `ADMIN_PASSWORD`.
 - Keep `.env` private (never commit secrets).
-- Keep `GROQ_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` in environment/secret manager only.
+- Keep `GROQ_API_KEY` in environment/secret manager only.
 - Set strict `CORS_ORIGINS` and `FRONTEND_URL` for your deployment domains.
 - Enable structured logs in production: `JSON_LOGS=true`, `LOG_LEVEL=INFO`.
 - If using workers, switch `ASYNC_MODE=celery` and run Redis + Celery worker.

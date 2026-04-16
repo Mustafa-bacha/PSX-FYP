@@ -52,6 +52,7 @@ export function initDb() {
 			email TEXT NOT NULL UNIQUE,
 			password_hash TEXT,
 			full_name TEXT,
+			date_of_birth TEXT,
 			google_id TEXT UNIQUE,
 			avatar_url TEXT,
 			provider TEXT NOT NULL DEFAULT 'local',
@@ -157,4 +158,10 @@ export function initDb() {
 			CREATE INDEX IF NOT EXISTS idx_user_sim_equity_user_created
 				ON user_sim_equity_snapshots(user_id, created_at DESC);
 	`);
+
+	try {
+		db.exec(`ALTER TABLE users ADD COLUMN date_of_birth TEXT;`);
+	} catch {
+		// Column already exists on older databases.
+	}
 }
