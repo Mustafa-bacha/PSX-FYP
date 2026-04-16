@@ -33,6 +33,26 @@ Open:
 - React app: `http://127.0.0.1:5173`
 - Express API: `http://127.0.0.1:5001/api/health`
 
+### Safe one-command deploy (EC2)
+
+For constrained instances, use the included safe deploy script. It pulls latest code, restarts services, and waits/retries until health endpoints are ready.
+
+On the EC2 host (inside `/home/ubuntu/PSX-FYP`):
+
+```bash
+bash deploy-safe.sh
+```
+
+Optional full refresh (dependencies + client build):
+
+```bash
+DEPLOY_FULL=1 bash deploy-safe.sh
+```
+
+Notes:
+- Default mode is fast and free-tier friendly.
+- Full mode is slower but useful after dependency changes.
+
 Environment:
 
 - Copy `.env.example` to `.env` and set `GROQ_API_KEY`.
