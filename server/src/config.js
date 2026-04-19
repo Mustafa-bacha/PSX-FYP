@@ -56,6 +56,7 @@ export const config = {
   googleRedirectUri: process.env.GOOGLE_REDIRECT_URI || 'http://127.0.0.1:5001/api/auth/google/callback',
   startupHistoricalSync: !['0', 'false', 'no'].includes(String(process.env.STARTUP_HISTORICAL_SYNC || 'true').toLowerCase()),
   focusSymbolsXlsxPath: normalizePath(process.env.FOCUS_SYMBOLS_XLSX_PATH, path.resolve(ROOT, '..', 'Stocks and symbols.xlsx')),
+  focusSymbolsTxtPath: normalizePath(process.env.FOCUS_SYMBOLS_TXT_PATH, path.resolve(ROOT, 'data', 'stocks_name.txt')),
   focusRefreshLimit: Number(process.env.FOCUS_REFRESH_LIMIT || 200),
   focusAutoRefreshEnabled: !['0', 'false', 'no'].includes(String(process.env.FOCUS_AUTO_REFRESH_ENABLED || 'true').toLowerCase()),
   focusAutoRefreshIntervalSec: Number(process.env.FOCUS_AUTO_REFRESH_INTERVAL_SEC || 300),

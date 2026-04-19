@@ -81,6 +81,36 @@ function readFromWorkbook(filePath) {
   };
 }
 
+function readFromTextFile(filePath) {
+  if (!filePath || !fs.existsSync(filePath)) {
+    return { symbols: [], profiles: [], source: 'missing', path: filePath || null };
+  }
+
+  try {
+    const lines = fs.readFileSync(filePath, 'utf-8').split(/\r?\n/g);
+    const symbols = lines
+      .map((line) => String(line || '').trim())
+      .filter(Boolean)
+      .map((line) => {
+        const firstCell = line.split(/[\s,|;\t]+/)[0] || '';
+        return normalizeSymbol(firstCell);
+      })
+      .filter((sym) => /^[A-Z]{2,8}$/.test(sym))
+      .filter((sym) => !new Set(['SYMBOL', 'TICKER', 'SCRIP']).has(sym));
+
+    const deduped = Array.from(new Set(symbols));
+    return {
+      symbols: deduped,
+      profiles: deduped.map((symbol) => ({ symbol, company: '' })),
+      source: 'txt',
+      path: filePath,
+      count: deduped.length
+    };
+  } catch {
+    return { symbols: [], profiles: [], source: 'error', path: filePath || null };
+  }
+}
+
 let cache = { at: 0, payload: null };
 
 export function getFocusSymbols({ force = false } = {}) {
@@ -89,7 +119,10 @@ export function getFocusSymbols({ force = false } = {}) {
     return cache.payload;
   }
 
-  const payload = readFromWorkbook(config.focusSymbolsXlsxPath);
+  const workbookPayload = readFromWorkbook(config.focusSymbolsXlsxPath);
+  const payload = (workbookPayload.symbols || []).length
+    ? workbookPayload
+    : readFromTextFile(config.focusSymbolsTxtPath);
   cache = { at: now, payload };
   return payload;
 }

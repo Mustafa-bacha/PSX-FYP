@@ -8,6 +8,8 @@ import { buildFocusCandidates, getFocusSymbols, mapToBaseSymbol } from './focusS
 
 const overviewCache = new Map();
 const OVERVIEW_TTL_MS = 2 * 60 * 1000;
+const stocksListCache = new Map();
+const STOCKS_LIST_TTL_MS = 45 * 1000;
 
 function round2(v) {
   return v == null || Number.isNaN(v) ? null : Number(v.toFixed(2));
@@ -119,6 +121,13 @@ async function resolveExternalOverview(symbol, { refresh = false } = {}) {
 }
 
 export function listStocks(limit = 600) {
+  const maxRows = Math.max(1, Number(limit || 600));
+  const cacheKey = String(maxRows);
+  const cached = stocksListCache.get(cacheKey);
+  if (cached && (Date.now() - cached.at) <= STOCKS_LIST_TTL_MS) {
+    return cached.payload;
+  }
+
   const rows = db.prepare(`
     SELECT s.symbol, s.close, s.change_pct, s.date
     FROM stocks s
@@ -132,7 +141,7 @@ export function listStocks(limit = 600) {
 
   const latestBySymbol = new Map(rows.map((r) => [String(r.symbol || '').toUpperCase(), r]));
   const focus = getFocusSymbols();
-  const focusSymbols = (focus.symbols || []).slice(0, Math.max(1, Number(limit || 600)));
+  const focusSymbols = (focus.symbols || []).slice(0, maxRows);
 
   const snapshots = focusSymbols.map((symbol) => {
     const r = latestBySymbol.get(String(symbol || '').toUpperCase());
@@ -144,11 +153,14 @@ export function listStocks(limit = 600) {
     };
   });
 
-  return {
+  const payload = {
     count: snapshots.length,
     symbols: snapshots.map((r) => r.symbol),
     snapshots
   };
+
+  stocksListCache.set(cacheKey, { at: Date.now(), payload });
+  return payload;
 }
 
 export function getStockHistory(symbol, days = 365) {
