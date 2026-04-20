@@ -158,3 +158,6 @@ export function initDb() {
 				ON user_sim_equity_snapshots(user_id, created_at DESC);
 	`);
 }
+
+// Ensure schema exists before other modules prepare SQL statements at import time.
+initDb();
