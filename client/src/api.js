@@ -34,9 +34,35 @@ function normalizeConfidence(confidence) {
 
 function sentimentLabel(score) {
   const n = Number(score || 0);
-  if (n > 0.15) return 'Positive';
-  if (n < -0.15) return 'Negative';
+  if (n > 0.08) return 'Positive';
+  if (n < -0.08) return 'Negative';
   return 'Neutral';
+}
+
+function toPlainTextSummary(value) {
+  const input = String(value || '');
+  if (!input) return '';
+
+  return input
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<\s*br\s*\/?>/gi, '\n')
+    .replace(/<\/p\s*>/gi, '\n\n')
+    .replace(/<\/div\s*>/gi, '\n')
+    .replace(/<\/li\s*>/gi, '\n')
+    .replace(/<li[^>]*>/gi, '• ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/\r/g, '')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n[ \t]+/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 function mapHeadline(item = {}, fallbackSymbol = '') {
@@ -47,7 +73,7 @@ function mapHeadline(item = {}, fallbackSymbol = '') {
     sentiment: item.label ? `${item.label[0]}${item.label.slice(1).toLowerCase()}` : sentimentLabel(score),
     score: Number.isFinite(score) ? score.toFixed(2) : '0.00',
     headline: item.headline || item.title || 'Untitled',
-    summary: item.summary || '',
+    summary: toPlainTextSummary(item.summary || item.description || ''),
     source: item.source || 'news',
     time: ts,
     link: item.link || item.url || ''
@@ -172,10 +198,10 @@ export const stocks = {
     return { data: Array.isArray(payload?.data) ? payload.data : [] };
   },
 
-  async news(symbol, limit = 5) {
-    const detail = await apiClient.stockInsights(symbol);
-    const headlines = Array.isArray(detail?.sentiment?.recent_headlines) ? detail.sentiment.recent_headlines : [];
-    return { news: headlines.slice(0, limit).map((h) => mapHeadline(h, symbol)) };
+  async news(symbol, limit = 5, refresh = false) {
+    const payload = await apiClient.symbolNews(symbol, limit, refresh);
+    const items = Array.isArray(payload?.items) ? payload.items : [];
+    return { news: items.slice(0, limit).map((h) => mapHeadline(h, symbol)) };
   },
 
   async sentimentFeed(limit = 30, refresh = false) {

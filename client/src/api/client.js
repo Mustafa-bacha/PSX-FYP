@@ -25,6 +25,7 @@ export const apiClient = {
   stockOverview: (symbol, refresh = false) => api(`/stock/${encodeURIComponent(symbol)}/overview${refresh ? '?refresh=true' : ''}`),
   performers: (refresh = false) => api(`/market-performers${refresh ? '?refresh=true' : ''}`),
   dailyNews: (limit = 8, refresh = false) => api(`/news/daily?limit=${Math.max(1, Number(limit || 8))}${refresh ? '&refresh=true' : ''}`),
+  symbolNews: (symbol, limit = 12, refresh = false) => api(`/news/symbol/${encodeURIComponent(symbol)}?limit=${Math.max(1, Number(limit || 12))}${refresh ? '&refresh=true' : ''}`),
   refreshPrices: (symbols = []) => api('/refresh/prices', { method: 'POST', body: { symbols } }),
   syncStatus: () => api('/sync/status'),
   syncHistorical: (startDate = null) => api('/sync/historical', {

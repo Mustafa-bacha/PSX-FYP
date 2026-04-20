@@ -15,6 +15,8 @@ const NEWS_SOURCES = [
 	{ name: 'al_jazeera_economy', url: 'https://www.aljazeera.com/xml/rss/all.xml' }
 ];
 
+const GOOGLE_NEWS_RSS = 'https://news.google.com/rss/search';
+
 const POS_WORDS = ['gain', 'growth', 'profit', 'surge', 'up', 'strong', 'record', 'bullish', 'improve', 'beat'];
 const NEG_WORDS = ['loss', 'decline', 'drop', 'down', 'weak', 'risk', 'cut', 'bearish', 'fall', 'miss'];
 
@@ -53,6 +55,37 @@ function labelFromScoreHeuristic(score) {
 	return 'neutral';
 }
 
+function stripHtml(value, { preserveParagraphs = true } = {}) {
+	let out = String(value || '')
+		.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, ' ')
+		.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ' ');
+
+	if (preserveParagraphs) {
+		out = out
+			.replace(/<\s*br\s*\/?>/gi, '\n')
+			.replace(/<\/p\s*>/gi, '\n\n')
+			.replace(/<\/div\s*>/gi, '\n')
+			.replace(/<\/li\s*>/gi, '\n')
+			.replace(/<li[^>]*>/gi, '• ');
+	}
+
+	out = out
+		.replace(/<[^>]+>/g, ' ')
+		.replace(/&nbsp;/gi, ' ')
+		.replace(/&amp;/gi, '&')
+		.replace(/&quot;/gi, '"')
+		.replace(/&#39;/gi, "'")
+		.replace(/&lt;/gi, '<')
+		.replace(/&gt;/gi, '>')
+		.replace(/\r/g, '')
+		.replace(/[ \t]+\n/g, '\n')
+		.replace(/\n[ \t]+/g, '\n')
+		.replace(/\n{3,}/g, '\n\n')
+		.trim();
+
+	return preserveParagraphs ? out : normalizeText(out);
+}
+
 async function fetchRss(source) {
 	try {
 		const res = await axios.get(source.url, {
@@ -69,12 +102,57 @@ async function fetchRss(source) {
 		$('item').each((_, node) => {
 			const title = normalizeText($(node).find('title').first().text());
 			const link = normalizeText($(node).find('link').first().text());
-			const description = normalizeText($(node).find('description').first().text());
+			const description = stripHtml($(node).find('description').first().text(), { preserveParagraphs: true });
 			const pubDate = normalizeText($(node).find('pubDate').first().text());
 			if (!title) return;
 			items.push({ title, link, description, pubDate, source: source.name });
 		});
 		return items.slice(0, 120);
+	} catch {
+		return [];
+	}
+}
+
+async function fetchGoogleNewsByQuery(query, { limit = 20 } = {}) {
+	const q = normalizeText(query);
+	if (!q) return [];
+
+	try {
+		const url = `${GOOGLE_NEWS_RSS}?${new URLSearchParams({
+			q,
+			hl: 'en-PK',
+			gl: 'PK',
+			ceid: 'PK:en'
+		}).toString()}`;
+
+		const res = await axios.get(url, {
+			timeout: 30000,
+			headers: {
+				'User-Agent': 'Mozilla/5.0',
+				Accept: 'application/rss+xml, application/xml, text/xml, */*'
+			},
+			validateStatus: (s) => s >= 200 && s < 400
+		});
+
+		const $ = cheerio.load(res.data, { xmlMode: true });
+		const items = [];
+		$('item').each((_, node) => {
+			const title = normalizeText($(node).find('title').first().text());
+			const link = normalizeText($(node).find('link').first().text());
+			const description = stripHtml($(node).find('description').first().text(), { preserveParagraphs: true });
+			const pubDate = normalizeText($(node).find('pubDate').first().text());
+			if (!title) return;
+			items.push({
+				title,
+				link,
+				description,
+				pubDate,
+				source: 'google_news',
+				query: q
+			});
+		});
+
+		return items.slice(0, Math.max(1, Number(limit || 20)));
 	} catch {
 		return [];
 	}
@@ -112,7 +190,7 @@ export async function getLatestBusinessNewsFeed({ limit = 24, forceRefresh = fal
 
 	return pool.slice(0, normalizedLimit).map((item) => ({
 		title: normalizeText(item.title),
-		description: normalizeText(item.description),
+		description: stripHtml(item.description, { preserveParagraphs: true }),
 		pubDate: normalizeText(item.pubDate),
 		source: normalizeText(item.source)
 	}));
@@ -193,9 +271,28 @@ function storeSentimentRow({ symbol, score, label, source, headline }) {
 	return true;
 }
 
-async function collectSentimentCandidatesForSymbol(symbol, company = '') {
-	const newsPool = await getNewsPool();
+async function collectSentimentCandidatesForSymbol(symbol, company = '', { forceRefresh = false } = {}) {
+	const newsPool = await getNewsPool(Boolean(forceRefresh));
 	const reports = await fetchPsxReportHeadlines(symbol);
+	const companyName = normalizeText(company);
+	const baseSymbol = String(symbol || '').includes('-') ? String(symbol || '').split('-')[0] : symbol;
+	const googleQueries = [
+		`${symbol} pakistan stock exchange`,
+		`${baseSymbol} PSX stock`,
+		companyName ? `${companyName} PSX` : null,
+		companyName ? `${companyName} share price pakistan` : null
+	].filter(Boolean);
+
+	const googleCollected = [];
+	for (const query of googleQueries.slice(0, 3)) {
+		// eslint-disable-next-line no-await-in-loop
+		const rows = await fetchGoogleNewsByQuery(query, { limit: 8 });
+		googleCollected.push(...rows);
+	}
+
+	const googleNews = googleCollected
+		.filter((item) => symbolMatchesItem(symbol, company, item))
+		.slice(0, 8);
 
 	const symbolNews = newsPool
 		.filter((item) => symbolMatchesItem(symbol, company, item))
@@ -208,7 +305,21 @@ async function collectSentimentCandidatesForSymbol(symbol, company = '') {
 			company,
 			source: item.source,
 			headline: item.title,
-			body: item.description || ''
+			body: item.description || '',
+			link: item.link || '',
+			pubDate: item.pubDate || ''
+		});
+	}
+
+	for (const item of googleNews) {
+		candidates.push({
+			symbol,
+			company,
+			source: 'google_news',
+			headline: item.title,
+			body: item.description || '',
+			link: item.link || '',
+			pubDate: item.pubDate || ''
 		});
 	}
 
@@ -218,23 +329,36 @@ async function collectSentimentCandidatesForSymbol(symbol, company = '') {
 			company,
 			source: 'psx_report',
 			headline: rep.title,
-			body: ''
+			body: '',
+			link: rep.link || '',
+			pubDate: ''
 		});
+	}
+
+	const deduped = [];
+	const seen = new Set();
+	for (const row of candidates) {
+		const key = `${String(row.source || '').toLowerCase()}|${String(row.headline || '').toLowerCase().trim()}`;
+		if (!row.headline || seen.has(key)) continue;
+		seen.add(key);
+		deduped.push(row);
 	}
 
 	return {
 		symbol,
 		company,
 		matched_news: symbolNews.length,
+		matched_google_news: googleNews.length,
 		matched_reports: reports.length,
-		candidates
+		candidates: deduped
 	};
 }
 
 export async function ingestSentimentForSymbol(symbol, company = '', opts = {}) {
 	const forceDailyCheckpoint = Boolean(opts.forceDailyCheckpoint);
 	const checkpointTag = String(opts.checkpointTag || '').trim();
-	const payload = await collectSentimentCandidatesForSymbol(symbol, company);
+	const forceRefresh = Boolean(opts.forceRefresh);
+	const payload = await collectSentimentCandidatesForSymbol(symbol, company, { forceRefresh });
 
 	let inserted = 0;
 	const texts = payload.candidates.map((c) => `${c.headline} ${c.body || ''}`.trim());
@@ -258,8 +382,8 @@ export async function ingestSentimentForSymbol(symbol, company = '', opts = {}) 
 		})) inserted += 1;
 	});
 
-		// Guarantee at least one daily sentiment checkpoint per symbol.
-		if (inserted === 0 || forceDailyCheckpoint) {
+		// Guarantee at least one daily sentiment checkpoint only when no real item was ingested.
+		if (inserted === 0 && forceDailyCheckpoint) {
 			const fallbackTitle = checkpointTag
 				? `Daily sentiment scan for ${symbol} [${checkpointTag}]`
 				: `Daily sentiment scan for ${symbol}: no material headlines captured.`;
@@ -277,7 +401,61 @@ export async function ingestSentimentForSymbol(symbol, company = '', opts = {}) 
 		company,
 		inserted,
 			matched_news: payload.matched_news,
+			matched_google_news: payload.matched_google_news,
 			matched_reports: payload.matched_reports
+	};
+}
+
+export async function getLatestSymbolNewsFeed(symbol, { limit = 16, forceRefresh = false } = {}) {
+	const sym = String(symbol || '').trim().toUpperCase();
+	if (!sym) return { symbol: sym, count: 0, items: [] };
+
+	const focus = getFocusSymbols();
+	const profileMap = new Map((focus.profiles || []).map((p) => [String(p.symbol || '').toUpperCase(), p.company || '']));
+	const company = profileMap.get(sym) || profileMap.get(sym.includes('-') ? sym.split('-')[0] : sym) || '';
+
+	const payload = await collectSentimentCandidatesForSymbol(sym, company, { forceRefresh: Boolean(forceRefresh) });
+	const capped = (payload.candidates || []).slice(0, Math.max(1, Number(limit || 16)));
+	const texts = capped.map((c) => `${c.headline} ${c.body || ''}`.trim());
+	const modelResults = classifyHeadlinesWithPython(texts);
+
+	const items = capped.map((item, idx) => {
+		const scored = modelResults[idx] || {};
+		const score = Number.isFinite(Number(scored.score))
+			? Number(scored.score)
+			: scoreTextHeuristic(`${item.headline} ${item.body || ''}`);
+		const label = ['positive', 'negative', 'neutral'].includes(String(scored.label || '').toLowerCase())
+			? String(scored.label).toLowerCase()
+			: labelFromScoreHeuristic(score);
+
+		storeSentimentRow({
+			symbol: sym,
+			score,
+			label,
+			source: item.source,
+			headline: item.headline
+		});
+
+		return {
+			symbol: sym,
+			headline: item.headline,
+			summary: stripHtml(item.body || '', { preserveParagraphs: true }),
+			source: item.source || 'news',
+			label,
+			score,
+			link: item.link || '',
+			analyzed_at: item.pubDate || new Date().toISOString()
+		};
+	});
+
+	return {
+		symbol: sym,
+		company,
+		count: items.length,
+		matched_news: payload.matched_news,
+		matched_google_news: payload.matched_google_news,
+		matched_reports: payload.matched_reports,
+		items
 	};
 }
 

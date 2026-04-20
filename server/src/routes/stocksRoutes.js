@@ -25,7 +25,8 @@ import {
 } from '../services/sentimentSchedulerService.js';
 import { getMarketSummary } from '../services/marketSummaryService.js';
 import { getMarketSummarySchedulerStatus } from '../services/marketSummarySchedulerService.js';
-import { getLatestBusinessNewsFeed } from '../services/sentimentIngestionService.js';
+import { getLatestBusinessNewsFeed, getLatestSymbolNewsFeed } from '../services/sentimentIngestionService.js';
+import { classifyHeadlinesWithPython } from '../services/sentimentModelBridgeService.js';
 import {
   addUserWatchlistSymbol,
   listUserWatchlist,
@@ -111,6 +112,7 @@ stocksRouter.get('/news/daily', async (req, res) => {
 
     if (forceRefresh) {
       const feed = await getLatestBusinessNewsFeed({ limit: Math.max(limit * 3, 18), forceRefresh: true });
+      const scored = classifyHeadlinesWithPython(feed.map((r) => `${r.title || ''} ${r.description || ''}`.trim()));
 
       const findLatestSentiment = db.prepare(`
         SELECT label, score, analyzed_at
@@ -132,12 +134,18 @@ stocksRouter.get('/news/daily', async (req, res) => {
         seenRefreshed.add(dedupeKey);
 
         const sentiment = findLatestSentiment.get(String(row.source || ''), headline) || {};
+        const inferred = scored[refreshedItems.length] || {};
+        const inferredScore = Number.isFinite(Number(inferred.score)) ? Number(inferred.score) : 0;
+        const inferredLabel = ['positive', 'negative', 'neutral'].includes(String(inferred.label || '').toLowerCase())
+          ? String(inferred.label).toLowerCase()
+          : 'neutral';
+
         refreshedItems.push({
           headline,
           summary: String(row.description || '').trim(),
           source: row.source,
-          label: String(sentiment.label || 'neutral').toLowerCase(),
-          score: Number(sentiment.score || 0),
+          label: String(sentiment.label || inferredLabel || 'neutral').toLowerCase(),
+          score: sentiment.score == null ? inferredScore : Number(sentiment.score || 0),
           analyzed_at: sentiment.analyzed_at || row.pubDate || new Date().toISOString()
         });
 
@@ -273,6 +281,20 @@ stocksRouter.post('/chat', optionalAuth, async (req, res) => {
         }
       });
     }
+    return res.status(500).json({ error: String(err?.message || err) });
+  }
+});
+
+stocksRouter.get('/news/symbol/:symbol', async (req, res) => {
+  try {
+    const symbol = String(req.params.symbol || '').toUpperCase().trim();
+    if (!symbol) return res.status(400).json({ error: 'symbol is required' });
+
+    const limit = Math.min(24, Math.max(1, Number(req.query.limit || 12)));
+    const forceRefresh = ['1', 'true', 'yes'].includes(String(req.query.refresh || '').toLowerCase());
+    const payload = await getLatestSymbolNewsFeed(symbol, { limit, forceRefresh });
+    return res.json({ ok: true, ...payload });
+  } catch (err) {
     return res.status(500).json({ error: String(err?.message || err) });
   }
 });

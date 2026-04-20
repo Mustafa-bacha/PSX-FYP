@@ -5,7 +5,6 @@ export function WorkspaceHomePage({ user, onOpenMarket, onOpenDashboard, onOpenS
   const [news, setNews] = useState([]);
   const [loadingNews, setLoadingNews] = useState(true);
   const [newsError, setNewsError] = useState('');
-  const [expandedNews, setExpandedNews] = useState({});
 
   const loadDailyNews = async (forceRefresh = false) => {
     setLoadingNews(true);
@@ -14,11 +13,9 @@ export function WorkspaceHomePage({ user, onOpenMarket, onOpenDashboard, onOpenS
       const payload = await apiClient.dailyNews(8, forceRefresh);
       const nextItems = Array.isArray(payload?.items) ? payload.items : [];
       setNews(nextItems);
-      setExpandedNews({});
     } catch (err) {
       setNewsError(String(err?.message || err || 'Failed to load daily news'));
       setNews([]);
-      setExpandedNews({});
     } finally {
       setLoadingNews(false);
     }
@@ -48,10 +45,6 @@ export function WorkspaceHomePage({ user, onOpenMarket, onOpenDashboard, onOpenS
 
     const source = sourceLabel(item?.source);
     return `${headline}. This update is sourced from ${source} and reflects the latest business news signal captured by the platform. Use it as a quick context check before deeper market analysis.`;
-  };
-
-  const toggleExpanded = (key) => {
-    setExpandedNews((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   return (
@@ -104,18 +97,9 @@ export function WorkspaceHomePage({ user, onOpenMarket, onOpenDashboard, onOpenS
                   <small>{sourceLabel(item.source)}</small>
                 </div>
                 <p>{item.headline}</p>
-                <p className={`daily-news-summary ${expandedNews[idx] ? 'expanded' : 'collapsed'}`}>
+                <p className="daily-news-summary expanded" style={{ whiteSpace: 'pre-line' }}>
                   {summaryText(item)}
                 </p>
-                <div className="daily-news-foot">
-                  <button
-                    className="toggle-btn"
-                    onClick={() => toggleExpanded(idx)}
-                    aria-expanded={Boolean(expandedNews[idx])}
-                  >
-                    {expandedNews[idx] ? 'Show less' : 'Read more'}
-                  </button>
-                </div>
               </li>
             ))}
           </ul>

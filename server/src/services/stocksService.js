@@ -31,6 +31,42 @@ function clamp(num, min, max) {
   return Math.min(max, Math.max(min, num));
 }
 
+function normalizeConfidence01(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 0;
+  if (n > 1) return clamp(n / 100, 0, 1);
+  return clamp(n, 0, 1);
+}
+
+function scoreToSentimentLabel(score) {
+  const n = Number(score || 0);
+  if (n > 0.08) return 'positive';
+  if (n < -0.08) return 'negative';
+  return 'neutral';
+}
+
+function directionToSignal(direction) {
+  const d = String(direction || '').toUpperCase();
+  if (d === 'UP') return 1;
+  if (d === 'DOWN') return -1;
+  return 0;
+}
+
+function recommendationFromSignals(directionSignal, newsScore) {
+  if (directionSignal > 0 && newsScore >= -0.06) return 'Buy';
+  if (directionSignal < 0 && newsScore <= 0.06) return 'Sell';
+  if (newsScore > 0.24) return 'Buy';
+  if (newsScore < -0.24) return 'Sell';
+  return 'Hold';
+}
+
+function recommendationToSignal(recommendation) {
+  const r = String(recommendation || '').toLowerCase();
+  if (r.includes('buy')) return 1;
+  if (r.includes('sell')) return -1;
+  return 0;
+}
+
 function safeOne(sql, params = []) {
   try {
     return db.prepare(sql).get(...params);
@@ -247,39 +283,73 @@ export function getStockInsights(symbol) {
   const modelPrediction = getPythonModelPrediction(ticker);
   const prediction = modelPrediction || heuristicPrediction;
 
-  const sentimentRow = safeOne(`
-    SELECT AVG(score) AS average_score,
-           SUM(CASE WHEN label='positive' THEN 1 ELSE 0 END) AS positive_count,
-           SUM(CASE WHEN label='negative' THEN 1 ELSE 0 END) AS negative_count,
-           SUM(CASE WHEN label='neutral' THEN 1 ELSE 0 END) AS neutral_count,
-           SUM(CASE WHEN source='psx_report' THEN 1 ELSE 0 END) AS psx_report_count,
-           MAX(analyzed_at) AS analyzed_at
-    FROM sentiment
-    WHERE symbol = ?
-  `, [ticker]) || {};
-
-  const recentHeadlines = safeAll(`
+  const sentimentRows = safeAll(`
     SELECT headline, label, score, source, analyzed_at
     FROM sentiment
     WHERE symbol = ?
+      AND source <> 'daily_scan'
+      AND LOWER(TRIM(headline)) NOT LIKE 'daily sentiment scan%'
     ORDER BY analyzed_at DESC
-    LIMIT 8
+    LIMIT 30
   `, [ticker]);
 
-  const averageScore = sentimentRow.average_score == null
-    ? 0
-    : Number(sentimentRow.average_score);
+  const recentHeadlines = sentimentRows.slice(0, 8);
+  const scoreValues = sentimentRows
+    .map((row) => Number(row.score))
+    .filter((v) => Number.isFinite(v));
+
+  const newsAverageScore = scoreValues.length ? avg(scoreValues) : 0;
+  const positiveCount = sentimentRows.reduce((s, row) => (String(row.label || '').toLowerCase() === 'positive' ? s + 1 : s), 0);
+  const negativeCount = sentimentRows.reduce((s, row) => (String(row.label || '').toLowerCase() === 'negative' ? s + 1 : s), 0);
+  const neutralCount = sentimentRows.length - positiveCount - negativeCount;
+  const psxReportCount = sentimentRows.reduce((s, row) => (String(row.source || '').toLowerCase() === 'psx_report' ? s + 1 : s), 0);
+
+  const predictionDirectionSignal = directionToSignal(prediction?.predicted_direction);
+  const predictionConfidence = normalizeConfidence01(prediction?.confidence);
+  const predictionSignal = predictionDirectionSignal * predictionConfidence;
+  const momentumSignal = clamp(driftPct / 3.5, -1, 1);
+  const baseRecommendation = recommendationFromSignals(predictionDirectionSignal, newsAverageScore);
+  const recommendationSignal = recommendationToSignal(baseRecommendation);
+
+  const compositeScore = clamp(
+    (newsAverageScore * 0.5)
+      + (predictionSignal * 0.25)
+      + (momentumSignal * 0.15)
+      + (recommendationSignal * 0.1),
+    -1,
+    1
+  );
+
+  let recommendation = baseRecommendation;
+  if (Math.abs(compositeScore) < 0.06) recommendation = 'Hold';
+  else if (compositeScore > 0.22) recommendation = 'Buy';
+  else if (compositeScore < -0.22) recommendation = 'Sell';
+
+  const reasoning = [
+    `Composite sentiment blends recent headlines (${newsAverageScore.toFixed(2)}), prediction signal (${predictionSignal.toFixed(2)}), and price momentum (${momentumSignal.toFixed(2)}).`,
+    `Current combined score is ${compositeScore.toFixed(2)} with model direction ${predictionDirectionSignal >= 0 ? 'UP/NEUTRAL' : 'DOWN'}.`
+  ].join(' ');
 
   return {
     symbol: ticker,
     prediction,
+    recommendation,
+    action: recommendation,
+    reasoning,
     sentiment: {
-      average_score: Number(averageScore.toFixed(4)),
-      positive_count: Number(sentimentRow.positive_count || 0),
-      negative_count: Number(sentimentRow.negative_count || 0),
-      neutral_count: Number(sentimentRow.neutral_count || 0),
-      psx_report_count: Number(sentimentRow.psx_report_count || 0),
-      analyzed_at: sentimentRow.analyzed_at || null,
+      average_score: Number(compositeScore.toFixed(4)),
+      news_average_score: Number(newsAverageScore.toFixed(4)),
+      signal_breakdown: {
+        prediction_signal: Number(predictionSignal.toFixed(4)),
+        momentum_signal: Number(momentumSignal.toFixed(4)),
+        recommendation_bias: Number(recommendationSignal.toFixed(4))
+      },
+      label: scoreToSentimentLabel(compositeScore),
+      positive_count: Number(positiveCount || 0),
+      negative_count: Number(negativeCount || 0),
+      neutral_count: Number(neutralCount || 0),
+      psx_report_count: Number(psxReportCount || 0),
+      analyzed_at: sentimentRows[0]?.analyzed_at || null,
       recent_headlines: recentHeadlines.map((h) => ({
         headline: h.headline,
         label: h.label || 'neutral',

@@ -187,7 +187,6 @@ export default function SentimentAnalysis() {
 function NewsCard({ item, showSymbol }) {
   const sentiment = String(item.sentiment || 'Neutral');
   const score = Number(item.score);
-  const readHref = item.link || (item.symbol ? `/dashboard/${item.symbol}` : null);
 
   return (
     <article className={`${cardClass} border-slate-600/50 p-4 h-full flex flex-col`}>
@@ -208,37 +207,13 @@ function NewsCard({ item, showSymbol }) {
       </h3>
 
       {item.summary && (
-        <p className="text-slate-300 text-sm leading-6 mb-4 flex-1">{item.summary}</p>
+        <p className="text-slate-300 text-sm leading-6 mb-4 flex-1 whitespace-pre-line">{item.summary}</p>
       )}
 
       <div className="mt-auto flex items-center justify-between gap-3">
         <span className="text-slate-500 text-xs">
           {item.time || 'Latest update'}
         </span>
-
-        {readHref ? (
-          item.link ? (
-            <a
-              href={item.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-slate-700/80 hover:bg-slate-600 border border-slate-500/60 text-slate-100 text-sm font-semibold transition-colors"
-            >
-              Read more
-            </a>
-          ) : (
-            <Link
-              to={readHref}
-              className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-slate-700/80 hover:bg-slate-600 border border-slate-500/60 text-slate-100 text-sm font-semibold transition-colors"
-            >
-              Read more
-            </Link>
-          )
-        ) : (
-          <span className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-500 text-sm font-semibold cursor-not-allowed">
-            Read more
-          </span>
-        )}
       </div>
     </article>
   );

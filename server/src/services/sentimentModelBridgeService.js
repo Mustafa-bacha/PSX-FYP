@@ -31,7 +31,19 @@ export function classifyHeadlinesWithPython(headlines = []) {
 
   let parsed = null;
   try {
-    parsed = JSON.parse(String(run.stdout || '').trim());
+    const raw = String(run.stdout || '').trim();
+    const lines = raw.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+    for (let i = lines.length - 1; i >= 0; i -= 1) {
+      try {
+        parsed = JSON.parse(lines[i]);
+        break;
+      } catch {
+        // keep scanning upward for JSON payload line
+      }
+    }
+    if (!parsed && raw) {
+      parsed = JSON.parse(raw);
+    }
   } catch {
     return fallbackResults(list.length);
   }

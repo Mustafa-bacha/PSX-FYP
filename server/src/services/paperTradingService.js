@@ -168,6 +168,7 @@ function executeImmediateTrade(userId, symbol, side, quantity, priceInput = null
   if (!latest || latest.close == null) throw new Error(`No live price found for ${symbol}`);
 
   const price = Number(priceInput ?? latest.close);
+  if (!Number.isFinite(price) || price <= 0) throw new Error(`Invalid execution price for ${symbol}`);
   const notional = price * quantity;
 
   const tx = db.transaction(() => {
@@ -189,7 +190,7 @@ function executeImmediateTrade(userId, symbol, side, quantity, priceInput = null
       upsertPosition({ userId, symbol, quantity: nextQty, avgCost: nextAvg, realizedPnl: prevRealized });
       updateCash(userId, cash - notional);
       addTrade({ userId, symbol, side: 'BUY', quantity, price, notional, realizedPnl: 0 });
-      return;
+      return { price, notional, realized_pnl: 0 };
     }
 
     if (!pos || prevQty <= 0) throw new Error(`No open simulated position to sell for ${symbol}`);
@@ -203,9 +204,10 @@ function executeImmediateTrade(userId, symbol, side, quantity, priceInput = null
     upsertPosition({ userId, symbol, quantity: nextQty, avgCost: nextAvg, realizedPnl: nextRealized });
     updateCash(userId, cash + notional);
     addTrade({ userId, symbol, side: 'SELL', quantity, price, notional, realizedPnl: realizedDelta });
+    return { price, notional, realized_pnl: realizedDelta };
   });
 
-  tx();
+  return tx();
 }
 
 function shouldFillLimit(order, latestPrice) {
@@ -230,11 +232,13 @@ function processPendingOrdersForUser(userId) {
     if (!shouldFillLimit(order, marketPrice)) continue;
 
     try {
-      executeImmediateTrade(userId, symbol, String(order.side || 'BUY').toUpperCase(), Number(order.quantity || 0), marketPrice);
+      const limitPrice = Number(order.limit_price || 0);
+      const executionPrice = Number.isFinite(limitPrice) && limitPrice > 0 ? limitPrice : marketPrice;
+      executeImmediateTrade(userId, symbol, String(order.side || 'BUY').toUpperCase(), Number(order.quantity || 0), executionPrice);
       updateOrderStatus(order.id, {
         status: 'FILLED',
-        filledPrice: marketPrice,
-        note: `Filled at market ${marketPrice.toFixed(2)}`
+        filledPrice: executionPrice,
+        note: `Filled at ${executionPrice.toFixed(2)} (${String(order.order_type || 'LIMIT').toUpperCase()})`
       });
       filled += 1;
     } catch (err) {
@@ -254,8 +258,8 @@ export function buySimulatedAsset(userId, symbolInput, quantityInput) {
   const quantity = normalizeQty(quantityInput);
   if (!symbol) throw new Error('symbol is required');
   if (!quantity) throw new Error('quantity must be a positive number');
-  executeImmediateTrade(userId, symbol, 'BUY', quantity);
-  addOrder({ userId, symbol, side: 'BUY', orderType: 'MARKET', quantity, status: 'FILLED' });
+  const trade = executeImmediateTrade(userId, symbol, 'BUY', quantity);
+  addOrder({ userId, symbol, side: 'BUY', orderType: 'MARKET', quantity, status: 'FILLED', filledPrice: trade?.price ?? null, note: 'Executed immediately' });
   return getSimulationPortfolio(userId);
 }
 
@@ -265,8 +269,8 @@ export function sellSimulatedAsset(userId, symbolInput, quantityInput) {
   if (!symbol) throw new Error('symbol is required');
   if (!quantity) throw new Error('quantity must be a positive number');
 
-  executeImmediateTrade(userId, symbol, 'SELL', quantity);
-  addOrder({ userId, symbol, side: 'SELL', orderType: 'MARKET', quantity, status: 'FILLED' });
+  const trade = executeImmediateTrade(userId, symbol, 'SELL', quantity);
+  addOrder({ userId, symbol, side: 'SELL', orderType: 'MARKET', quantity, status: 'FILLED', filledPrice: trade?.price ?? null, note: 'Executed immediately' });
   return getSimulationPortfolio(userId);
 }
 
@@ -282,8 +286,8 @@ export function placeSimulatedOrder(userId, payload = {}) {
   if (!quantity) throw new Error('quantity must be a positive number');
 
   if (orderType === 'MARKET') {
-    executeImmediateTrade(userId, symbol, side, quantity);
-    const orderId = addOrder({ userId, symbol, side, orderType, quantity, status: 'FILLED', filledPrice: null, note: 'Executed immediately' });
+    const trade = executeImmediateTrade(userId, symbol, side, quantity);
+    const orderId = addOrder({ userId, symbol, side, orderType, quantity, status: 'FILLED', filledPrice: trade?.price ?? null, note: 'Executed immediately' });
     return { order_id: orderId, status: 'FILLED', ...getSimulationPortfolio(userId) };
   }
 

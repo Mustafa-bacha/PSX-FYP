@@ -10,6 +10,14 @@ function formatMoney(value) {
   return `PKR ${n.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 }
 
+function formatPnl(value) {
+  const n = Number(value || 0);
+  if (!Number.isFinite(n)) return '—';
+  const abs = Math.abs(n).toLocaleString(undefined, { maximumFractionDigits: 2 });
+  const sign = n > 0 ? '+' : n < 0 ? '-' : '';
+  return `${sign}PKR ${abs}`;
+}
+
 function formatQty(value) {
   const n = Number(value || 0);
   if (!Number.isFinite(n)) return '0';
@@ -257,11 +265,13 @@ export default function Simulator() {
         {!error && notice ? <p className="mt-3 text-sm text-green-400">{notice}</p> : null}
       </section>
 
-      <section className="grid sm:grid-cols-2 xl:grid-cols-4 gap-3">
+      <section className="grid sm:grid-cols-2 xl:grid-cols-6 gap-3">
         <SummaryCard label="Cash" value={formatMoney(account.cash_balance)} />
         <SummaryCard label="Equity" value={formatMoney(account.equity)} />
         <SummaryCard label="Market Value" value={formatMoney(account.market_value)} />
-        <SummaryCard label="Total P/L" value={formatMoney(account.total_pnl)} accentClass={pnlClass(account.total_pnl)} subtitle={`Realized: ${formatMoney(account.realized_pnl)} · Unrealized: ${formatMoney(account.unrealized_pnl)}`} />
+        <SummaryCard label="Total P/L" value={formatPnl(account.total_pnl)} accentClass={pnlClass(account.total_pnl)} />
+        <SummaryCard label="Realized P/L" value={formatPnl(account.realized_pnl)} accentClass={pnlClass(account.realized_pnl)} />
+        <SummaryCard label="Unrealized P/L" value={formatPnl(account.unrealized_pnl)} accentClass={pnlClass(account.unrealized_pnl)} />
       </section>
 
       <section className="grid lg:grid-cols-[360px_minmax(0,1fr)] gap-4 items-start">

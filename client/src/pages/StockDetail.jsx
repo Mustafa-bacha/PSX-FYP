@@ -344,7 +344,7 @@ export default function StockDetail() {
               compactNews.map((item, i) => (
                 <div key={i} className="p-4">
                   <p className="text-slate-200 text-sm font-medium">{item.headline}</p>
-                  {item.summary && <p className="text-slate-400 text-xs mt-1">{item.summary}</p>}
+                  {item.summary && <p className="text-slate-400 text-xs mt-1 whitespace-pre-line">{item.summary}</p>}
                   <p className="text-slate-500 text-xs mt-1">
                     {item.sentiment} (score: {item.score}) · {item.source}
                   </p>
